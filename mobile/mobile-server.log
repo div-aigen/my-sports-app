@@ -1,0 +1,114 @@
+
+> mobile@1.0.0 start
+> expo start --port 8085
+
+Starting project at C:\Users\divya\Football App\mobile
+React Compiler enabled
+Starting Metro Bundler
+Waiting on http://localhost:8085
+Logs for your project will appear below.
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 95.4% (791/855)
+λ node_modules\expo-router\node\render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 96.6% (1099/1137)
+λ Bundled 4943ms node_modules\expo-router\node\render.js (1289 modules)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (1208/1208)
+Web Bundled 8140ms node_modules\expo-router\entry.js (1208 modules)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 98ms node_modules\expo-router\node\render.js (1 module)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web Bundled 1089ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 1278ms node_modules\expo-router\entry.js (1208 modules)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 83ms node_modules\expo-router\node\render.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web Bundled 4568ms node_modules\expo-router\entry.js (1 module)
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web Bundled 107ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 129ms node_modules\expo-router\node\render.js (1 module)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web Bundled 1530ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 98ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 128ms node_modules\expo-router\node\render.js (1 module)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web Bundled 1461ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 116ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 59ms node_modules\expo-router\node\render.js (1 module)
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+  console.warn (C:\Users\divya\Football App\mobile\node_modules\expo\node_modules\@expo\cli\src\start\server\serverLogLikeMetro.ts:161:21)
+  warnOnce (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\warnOnce\index.js:24:13)
+  createDOMProps (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\modules\createDOMProps\index.js:805:13)
+  createElement (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\createElement\index.js:23:32)
+  Component (C:\Users\divya\Football App\mobile\node_modules\react-native-web\dist\exports\View\index.js:111:23)
+  Object.callComponentInDEV [as react-stack-bottom-frame] (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:8970:18)
+  renderWithHooks (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:4699:19)
+  run (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5539:39)
+  retryNode (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5899:31)
+  renderNodeDestructive (C:\Users\divya\Football App\mobile\node_modules\react-dom\cjs\react-dom-server-legacy.node.development.js:5849:11)
+Web Bundled 752ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 82ms node_modules\expo-router\entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
