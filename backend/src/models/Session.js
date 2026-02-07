@@ -1,17 +1,17 @@
 const pool = require('../config/database');
 
 class Session {
-  static async create(creatorId, title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14) {
+  static async create(creatorId, title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14, scheduledEndTime = null) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
 
       // Create session
       const sessionResult = await client.query(
-        `INSERT INTO sessions (creator_id, title, description, location_address, scheduled_date, scheduled_time, total_cost, max_participants, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'open')
+        `INSERT INTO sessions (creator_id, title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'open')
          RETURNING *`,
-        [creatorId, title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants]
+        [creatorId, title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, maxParticipants]
       );
 
       const session = sessionResult.rows[0];
@@ -77,7 +77,7 @@ class Session {
     return result.rows;
   }
 
-  static async update(id, creatorId, title, description, locationAddress, scheduledDate, scheduledTime, totalCost) {
+  static async update(id, creatorId, title, description, locationAddress, scheduledDate, scheduledTime, totalCost, scheduledEndTime = null) {
     // Check if user is creator
     const session = await pool.query('SELECT creator_id FROM sessions WHERE id = $1', [id]);
     if (session.rows[0].creator_id !== creatorId) {
@@ -86,10 +86,10 @@ class Session {
 
     const result = await pool.query(
       `UPDATE sessions
-       SET title = $1, description = $2, location_address = $3, scheduled_date = $4, scheduled_time = $5, total_cost = $6, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $7
+       SET title = $1, description = $2, location_address = $3, scheduled_date = $4, scheduled_time = $5, scheduled_end_time = $6, total_cost = $7, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $8
        RETURNING *`,
-      [title, description, locationAddress, scheduledDate, scheduledTime, totalCost, id]
+      [title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, id]
     );
     return result.rows[0];
   }

@@ -8,25 +8,84 @@ import {
   Alert,
   ScrollView,
   ImageBackground,
+  Modal,
+  FlatList,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { sessionAPI } from '../../../services/api';
+
+// Location and sport data
+const LOCATIONS_AND_SPORTS = {
+  'Harmony Park, Lucknow': ['Cricket', 'Football', 'Pickleball', 'Basketball'],
+  'Central Stadium, Lucknow': ['Cricket', 'Football', 'Tennis', 'Basketball'],
+  'Jai Prakash Park, Lucknow': ['Football', 'Badminton', 'Basketball'],
+  'Ram Manohar Lohia Park, Lucknow': ['Cricket', 'Football', 'Volleyball'],
+  'Railway Sports Ground, Lucknow': ['Cricket', 'Football', 'Tennis'],
+  'Aishbagh Sports Complex, Lucknow': ['Badminton', 'Basketball', 'Volleyball'],
+};
 
 const CreateSessionScreen = ({ navigation }) => {
   const theme = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedSport, setSelectedSport] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateString, setDateString] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [cost, setCost] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('14');
   const [loading, setLoading] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showSportModal, setShowSportModal] = useState(false);
+  const [showStartTimeModal, setShowStartTimeModal] = useState(false);
+  const [showEndTimeModal, setShowEndTimeModal] = useState(false);
+
+  const timeOptions = ['00:00', '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30', '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'];
+
+  const availableSports = selectedLocation ? LOCATIONS_AND_SPORTS[selectedLocation] : [];
+
+  const handleDateChange = (event, selectedDate) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+      // Format date in local timezone (not UTC) to avoid off-by-one day error
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      setDateString(formattedDate);
+    }
+  };
 
   const handleCreate = async () => {
-    if (!title || !location || !date || !time || !cost || !maxParticipants) {
+    if (!title || !selectedLocation || !selectedSport || !dateString || !startTime || !endTime || !cost || !maxParticipants) {
       Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    // Validate that end time is after start time and at least 1 hour duration
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    let endMinutes = endHour * 60 + endMin;
+
+    // If end time is earlier than start time, assume it's next day
+    if (endMinutes <= startMinutes) {
+      endMinutes += 24 * 60; // Add 24 hours
+    }
+
+    const durationMinutes = endMinutes - startMinutes;
+
+    if (durationMinutes < 60) {
+      Alert.alert('Error', 'Session must be at least 1 hour long');
       return;
     }
 
@@ -38,14 +97,16 @@ const CreateSessionScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
+      // Create session with start time and end time
       const response = await sessionAPI.create(
         title,
         description,
-        location,
-        date,
-        time,
+        selectedLocation,
+        dateString,
+        startTime,
         parseFloat(cost),
-        maxParts
+        maxParts,
+        endTime // Send end time as 8th parameter for backend to store
       );
       Alert.alert('Success', 'Session created!', [
         {
@@ -73,85 +134,164 @@ const CreateSessionScreen = ({ navigation }) => {
       )}
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={[styles.header, { backgroundColor: theme.isDark ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)' }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[styles.backButtonBox, { borderColor: theme.colors.text }]}
+        >
           <Text style={[styles.backButton, { color: theme.colors.text}]}>← Back</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color: theme.colors.text }]}>Create Session</Text>
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Title *</Text>
+        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Title *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {
+            color: '#000',
+            borderColor: theme.isDark ? '#444' : '#ddd',
+            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
+          }]}
           placeholder="e.g., Friday Evening Football"
+          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
           value={title}
           onChangeText={setTitle}
           editable={!loading}
         />
 
-        <Text style={styles.label}>Description</Text>
+        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Description</Text>
         <TextInput
-          style={[styles.input, styles.textArea]}
+          style={[styles.input, styles.textArea, {
+            color: '#fff',
+            borderColor: theme.isDark ? '#444' : '#ddd',
+            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
+          }]}
           placeholder="Add details..."
+          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
           value={description}
           onChangeText={setDescription}
           multiline
           editable={!loading}
         />
 
-        <Text style={styles.label}>Location *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="e.g., Lucknow Central Park"
-          value={location}
-          onChangeText={setLocation}
-          editable={!loading}
-        />
+        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Location *</Text>
+        <TouchableOpacity
+          style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}
+          onPress={() => setShowLocationModal(true)}
+          disabled={loading}
+        >
+          <Text style={[styles.dropdownText, { color: selectedLocation ? theme.colors.text : '#999' }]}>
+            {selectedLocation || 'Select Location'}
+          </Text>
+          <Text style={[styles.dropdownArrow, { color: theme.colors.text }]}>▼</Text>
+        </TouchableOpacity>
+
+        {selectedLocation && (
+          <>
+            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Sport *</Text>
+            <TouchableOpacity
+              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}
+              onPress={() => setShowSportModal(true)}
+              disabled={loading}
+            >
+              <Text style={[styles.dropdownText, { color: selectedSport ? theme.colors.text : '#999' }]}>
+                {selectedSport || 'Select Sport'}
+              </Text>
+              <Text style={[styles.dropdownArrow, { color: theme.colors.text }]}>▼</Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         <View style={styles.row}>
           <View style={styles.halfInput}>
-            <Text style={styles.label}>Date *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={date}
-              onChangeText={setDate}
-              editable={!loading}
-            />
-          </View>
-          <View style={styles.halfInput}>
-            <Text style={styles.label}>Time *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="HH:MM"
-              value={time}
-              onChangeText={setTime}
-              editable={!loading}
-            />
+            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Date *</Text>
+            <TouchableOpacity
+              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
+              onPress={() => setShowDatePicker(true)}
+              disabled={loading}
+            >
+              <Text style={[styles.dropdownText, { color: dateString ? '#000' : '#999' }]}>
+                {dateString || 'Select Date'}
+              </Text>
+              <Text style={[styles.dropdownArrow, { color: '#000' }]}>📅</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
+              />
+            )}
+            {Platform.OS === 'ios' && showDatePicker && (
+              <View style={styles.datePickerButtons}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.datePickerButton}>Done</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
 
-        <Text style={styles.label}>Total Cost (₹) *</Text>
+        <View style={styles.row}>
+          <View style={styles.halfInput}>
+            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Start Time *</Text>
+            <TouchableOpacity
+              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
+              onPress={() => setShowStartTimeModal(true)}
+              disabled={loading}
+            >
+              <Text style={[styles.dropdownText, { color: startTime ? '#000' : '#999' }]}>
+                {startTime || 'Select Time'}
+              </Text>
+              <Text style={[styles.dropdownArrow, { color: '#000' }]}>🕐</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.halfInput}>
+            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>End Time *</Text>
+            <TouchableOpacity
+              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
+              onPress={() => setShowEndTimeModal(true)}
+              disabled={loading}
+            >
+              <Text style={[styles.dropdownText, { color: endTime ? '#000' : '#999' }]}>
+                {endTime || 'Select Time'}
+              </Text>
+              <Text style={[styles.dropdownArrow, { color: '#000' }]}>🕐</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Total Cost (₹) *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {
+            color: '#000',
+            borderColor: theme.isDark ? '#444' : '#ddd',
+            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
+          }]}
           placeholder="e.g., 500"
+          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
           value={cost}
           onChangeText={setCost}
           keyboardType="decimal-pad"
           editable={!loading}
         />
-        <Text style={styles.hint}>This will be split equally among all participants</Text>
+        <Text style={[styles.hint, { color: theme.isDark ? '#ddd' : '#fff' }]}>This will be split equally among all participants</Text>
 
-        <Text style={styles.label}>Max Participants *</Text>
+        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Max Participants *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {
+            color: '#000',
+            borderColor: theme.isDark ? '#444' : '#ddd',
+            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
+          }]}
           placeholder="e.g., 14 (min: 2, max: 50)"
+          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
           value={maxParticipants}
           onChangeText={setMaxParticipants}
           keyboardType="number-pad"
           editable={!loading}
         />
-        <Text style={styles.hint}>Maximum number of people who can join this session</Text>
+        <Text style={[styles.hint, { color: theme.isDark ? '#ddd' : '#fff' }]}>Maximum number of people who can join this session</Text>
 
         <View style={styles.actions}>
           <TouchableOpacity
@@ -171,6 +311,153 @@ const CreateSessionScreen = ({ navigation }) => {
         </View>
       </View>
     </ScrollView>
+
+    {/* Location Modal */}
+    <Modal visible={showLocationModal} transparent animationType="slide">
+      <View style={[styles.modalOverlay, { backgroundColor: theme.isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.isDark ? '#444' : '#eee' }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Select Location</Text>
+            <TouchableOpacity onPress={() => setShowLocationModal(false)}>
+              <Text style={[styles.modalClose, { color: theme.colors.text }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={Object.keys(LOCATIONS_AND_SPORTS)}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.modalOption,
+                  selectedLocation === item && styles.modalOptionSelected,
+                  { borderColor: theme.isDark ? '#444' : '#eee' }
+                ]}
+                onPress={() => {
+                  setSelectedLocation(item);
+                  setSelectedSport('');
+                  setShowLocationModal(false);
+                }}
+              >
+                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </View>
+    </Modal>
+
+    {/* Sport Modal */}
+    <Modal visible={showSportModal} transparent animationType="slide">
+      <View style={[styles.modalOverlay, { backgroundColor: theme.isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.isDark ? '#444' : '#eee' }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Select Sport</Text>
+            <TouchableOpacity onPress={() => setShowSportModal(false)}>
+              <Text style={[styles.modalClose, { color: theme.colors.text }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={availableSports}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.modalOption,
+                  selectedSport === item && styles.modalOptionSelected,
+                  { borderColor: theme.isDark ? '#444' : '#eee' }
+                ]}
+                onPress={() => {
+                  setSelectedSport(item);
+                  setShowSportModal(false);
+                }}
+              >
+                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </View>
+    </Modal>
+
+    {/* Start Time Modal */}
+    <Modal visible={showStartTimeModal} transparent animationType="slide">
+      <View style={[styles.modalOverlay, { backgroundColor: theme.isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.isDark ? '#444' : '#eee' }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Select Start Time</Text>
+            <TouchableOpacity onPress={() => setShowStartTimeModal(false)}>
+              <Text style={[styles.modalClose, { color: theme.colors.text }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={timeOptions}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.modalOption,
+                  startTime === item && styles.modalOptionSelected,
+                  { borderColor: theme.isDark ? '#444' : '#eee' }
+                ]}
+                onPress={() => {
+                  setStartTime(item);
+                  setShowStartTimeModal(false);
+                }}
+              >
+                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </View>
+    </Modal>
+
+    {/* End Time Modal */}
+    <Modal visible={showEndTimeModal} transparent animationType="slide">
+      <View style={[styles.modalOverlay, { backgroundColor: theme.isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.isDark ? '#444' : '#eee' }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Select End Time</Text>
+            <TouchableOpacity onPress={() => setShowEndTimeModal(false)}>
+              <Text style={[styles.modalClose, { color: theme.colors.text }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={timeOptions}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => {
+              // Check if this time is on next day (earlier than start time)
+              const [itemHour, itemMin] = item.split(':').map(Number);
+              const [startHour, startMin] = startTime.split(':').map(Number);
+              const itemMinutes = itemHour * 60 + itemMin;
+              const startMinutes = startHour * 60 + startMin;
+              const isNextDay = itemMinutes <= startMinutes && startTime !== '';
+
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.modalOption,
+                    endTime === item && styles.modalOptionSelected,
+                    { borderColor: theme.isDark ? '#444' : '#eee' }
+                  ]}
+                  onPress={() => {
+                    setEndTime(item);
+                    setShowEndTimeModal(false);
+                  }}
+                >
+                  <View style={styles.timeOptionContainer}>
+                    <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+                    {isNextDay && startTime && (
+                      <Text style={[styles.nextDayLabel, { color: theme.isDark ? '#aaa' : '#999' }]}>Next Day</Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+      </View>
+    </Modal>
     </View>
   );
 };
@@ -195,10 +482,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-  backButton: {
-    color: 'white',
-    fontSize: 16,
+  backButtonBox: {
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     marginBottom: 12,
+    alignSelf: 'flex-start',
+  },
+  backButton: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   title: {
     fontSize: 28,
@@ -216,12 +510,10 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 14,
-    backgroundColor: 'white',
   },
   textArea: {
     height: 80,
@@ -267,6 +559,84 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dropdownText: {
+    fontSize: 14,
+    flex: 1,
+  },
+  dropdownArrow: {
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingTop: 16,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalClose: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  modalOption: {
+    borderBottomWidth: 1,
+    padding: 16,
+  },
+  modalOptionSelected: {
+    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+  },
+  modalOptionText: {
+    fontSize: 14,
+  },
+  datePickerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  datePickerButton: {
+    color: '#2196F3',
+    fontSize: 16,
+    fontWeight: '600',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  timeOptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  nextDayLabel: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginLeft: 8,
   },
 });
 

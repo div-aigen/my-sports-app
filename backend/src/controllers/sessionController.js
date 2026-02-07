@@ -7,7 +7,7 @@ const createSession = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { title, description, location_address, scheduled_date, scheduled_time, total_cost, max_participants } = req.body;
+  const { title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants } = req.body;
   const creatorId = req.user.id;
 
   try {
@@ -19,7 +19,8 @@ const createSession = async (req, res) => {
       scheduled_date,
       scheduled_time,
       total_cost,
-      max_participants || 14
+      max_participants || 14,
+      scheduled_end_time || null
     );
 
     res.status(201).json({
@@ -71,7 +72,7 @@ const updateSession = async (req, res) => {
 
   try {
     const sessionId = parseInt(req.params.id);
-    const { title, description, location_address, scheduled_date, scheduled_time, total_cost } = req.body;
+    const { title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost } = req.body;
     const creatorId = req.user.id;
 
     const session = await Session.update(
@@ -82,7 +83,8 @@ const updateSession = async (req, res) => {
       location_address,
       scheduled_date,
       scheduled_time,
-      total_cost
+      total_cost,
+      scheduled_end_time || null
     );
 
     res.json({

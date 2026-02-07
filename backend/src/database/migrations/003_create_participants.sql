@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS participants (
   UNIQUE (session_id, user_id)
 );
 
-CREATE INDEX idx_participants_session_id ON participants(session_id);
-CREATE INDEX idx_participants_user_id ON participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_participants_session_id ON participants(session_id);
+CREATE INDEX IF NOT EXISTS idx_participants_user_id ON participants(user_id);

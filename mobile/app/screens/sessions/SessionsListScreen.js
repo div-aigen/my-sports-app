@@ -152,17 +152,48 @@ const SessionsListScreen = ({ navigation = null }) => {
   };
 
   const formatDate = (dateString) => {
+    // Parse ISO string and get local date (handles timezone properly)
+    if (!dateString) return '';
     const date = new Date(dateString);
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     return date.toLocaleDateString('en-US', options);
   };
 
   const formatTime = (timeString) => {
+    // Handle HH:MM format
+    if (!timeString) return '';
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const formatDateTime = (dateString) => {
+    // Just use formatDate directly - it handles ISO strings correctly
+    return formatDate(dateString);
+  };
+
+  const formatEndTimeWithDate = (startTime, endTime, dateString) => {
+    if (!endTime) return 'N/A';
+
+    const formattedTime = formatTime(endTime);
+
+    // Check if end time is next day (end time <= start time means it crossed midnight)
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+
+    if (endMinutes <= startMinutes && startTime) {
+      // End time is on next day - add 1 day to the date
+      const date = new Date(dateString);
+      const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+      const formattedDate = formatDate(nextDate.toISOString());
+      return `${formattedTime} (${formattedDate})`;
+    }
+
+    return formattedTime;
   };
 
   const handleShowSessionDetails = async (session) => {
@@ -191,7 +222,11 @@ const SessionsListScreen = ({ navigation = null }) => {
 
     if (date) {
       setSelectedDate(date);
-      const formattedDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      // Format date in local timezone (not UTC) to avoid off-by-one day error
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
       setFilterDate(formattedDate);
     }
   };
@@ -226,8 +261,8 @@ const SessionsListScreen = ({ navigation = null }) => {
       <View style={[styles.sessionDetails, { borderTopColor: theme.colors.border }]}>
         <View>
           <Text style={styles.detailLabel}>Date & Time</Text>
-          <Text style={styles.detailValue}>{item.scheduled_date}</Text>
-          <Text style={styles.detailValue}>{item.scheduled_time}</Text>
+          <Text style={styles.detailValue}>{formatDateTime(item.scheduled_date)}</Text>
+          <Text style={styles.detailValue}>{item.scheduled_time ? formatTime(item.scheduled_time) : ''}</Text>
         </View>
         <View>
           <Text style={styles.detailLabel}>Cost</Text>
@@ -437,14 +472,21 @@ const SessionsListScreen = ({ navigation = null }) => {
                 <View style={styles.infoCard}>
                   <Text style={styles.infoCardLabel}>📅 Date</Text>
                   <Text style={styles.infoCardValue}>
-                    {selectedSession?.scheduled_date ? formatDate(selectedSession.scheduled_date) : ''}
+                    {selectedSession?.scheduled_date ? formatDateTime(selectedSession.scheduled_date) : ''}
                   </Text>
                 </View>
 
                 <View style={styles.infoCard}>
-                  <Text style={styles.infoCardLabel}>🕐 Time</Text>
+                  <Text style={styles.infoCardLabel}>🕐 Start Time</Text>
                   <Text style={styles.infoCardValue}>
                     {selectedSession?.scheduled_time ? formatTime(selectedSession.scheduled_time) : ''}
+                  </Text>
+                </View>
+
+                <View style={styles.infoCard}>
+                  <Text style={styles.infoCardLabel}>🕑 End Time</Text>
+                  <Text style={styles.infoCardValue}>
+                    {formatEndTimeWithDate(selectedSession?.scheduled_time, selectedSession?.scheduled_end_time, selectedSession?.scheduled_date)}
                   </Text>
                 </View>
 

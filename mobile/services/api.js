@@ -54,13 +54,14 @@ export const sessionAPI = {
     return api.get('/sessions', { params });
   },
   get: (id) => api.get(`/sessions/${id}`),
-  create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14) =>
+  create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14, scheduledEndTime = null) =>
     api.post('/sessions', {
       title,
       description,
       location_address: locationAddress,
       scheduled_date: scheduledDate,
       scheduled_time: scheduledTime,
+      scheduled_end_time: scheduledEndTime,
       total_cost: totalCost,
       max_participants: maxParticipants,
     }),
