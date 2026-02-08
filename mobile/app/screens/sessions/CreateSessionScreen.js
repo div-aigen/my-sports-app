@@ -161,7 +161,7 @@ const CreateSessionScreen = ({ navigation }) => {
         <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Description</Text>
         <TextInput
           style={[styles.input, styles.textArea, {
-            color: '#fff',
+            color: '#000',
             borderColor: theme.isDark ? '#444' : '#ddd',
             backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
           }]}
