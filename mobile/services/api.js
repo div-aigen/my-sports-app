@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Use computer's IP for physical device, localhost for emulator/web
-const API_URL = 'http://192.168.178.70:5001/api';
+// Production backend URL
+const API_URL = 'https://my-sports-app-testing.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_URL,
