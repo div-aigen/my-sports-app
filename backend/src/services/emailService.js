@@ -1,33 +1,26 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 class EmailService {
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
-      },
-    });
-  }
-
   async sendPasswordResetEmail(email, resetToken, userName) {
     const htmlContent = this.getPasswordResetEmailHTML(userName, resetToken);
     const textContent = this.getPasswordResetEmailText(userName, resetToken);
 
     try {
-      const result = await this.transporter.sendMail({
-        from: `"My Sports App" <${process.env.EMAIL_USER}>`,
+      const msg = {
         to: email,
+        from: 'noreply@mysportsapp.com', // Change this to your SendGrid verified sender email
         subject: 'Password Reset Code - My Sports App',
         text: textContent,
         html: htmlContent,
-      });
+      };
 
-      console.log(`✓ Password reset email sent to ${email}`, result.messageId);
+      const result = await sgMail.send(msg);
+      console.log(`✓ Password reset email sent to ${email}`);
       return result;
     } catch (error) {
-      console.error(`✗ Failed to send password reset email to ${email}:`, error);
+      console.error(`✗ Failed to send password reset email to ${email}:`, error.message);
       throw error;
     }
   }
