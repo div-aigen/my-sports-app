@@ -9,12 +9,14 @@ import {
   ScrollView,
   ImageBackground,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 const LoginScreen = ({ navigation = null, showSignup = false }) => {
   const { login, signup } = useContext(AuthContext);
   const theme = useTheme();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -122,6 +124,16 @@ const LoginScreen = ({ navigation = null, showSignup = false }) => {
           editable={!loading}
         />
 
+        {!isSignup && (
+          <TouchableOpacity
+            onPress={() => router.push('/screens/auth/ForgotPasswordScreen')}
+            disabled={loading}
+            style={styles.forgotPasswordLink}
+          >
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={isSignup ? handleSignup : handleLogin}
@@ -216,6 +228,15 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     textAlign: 'center',
     marginTop: 16,
+    fontSize: 14,
+  },
+  forgotPasswordLink: {
+    alignSelf: 'flex-end',
+    marginTop: -8,
+    marginBottom: 16,
+  },
+  forgotPasswordText: {
+    color: '#2196F3',
     fontSize: 14,
   },
 });

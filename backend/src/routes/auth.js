@@ -52,4 +52,24 @@ router.post(
   authController.changePassword
 );
 
+// POST /api/auth/forgot-password
+router.post(
+  '/forgot-password',
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+  ],
+  authController.forgotPassword
+);
+
+// POST /api/auth/reset-password
+router.post(
+  '/reset-password',
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+    body('token').trim().notEmpty().withMessage('Reset code is required'),
+    body('new_password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  ],
+  authController.resetPassword
+);
+
 module.exports = router;

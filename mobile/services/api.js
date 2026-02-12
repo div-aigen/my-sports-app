@@ -45,6 +45,9 @@ export const authAPI = {
     api.post('/auth/signup', { email, password, full_name: fullName, phone_number: phoneNumber }),
   login: (email, password) => api.post('/auth/login', { email, password }),
   getMe: () => api.get('/auth/me'),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (email, token, newPassword) =>
+    api.post('/auth/reset-password', { email, token, new_password: newPassword }),
 };
 
 export const sessionAPI = {

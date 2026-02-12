@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const pool = require('../config/database');
 
 class User {
@@ -48,6 +49,53 @@ class User {
       'UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING id, email, full_name, phone_number',
       [hashedPassword, userId]
     );
+    return result.rows[0];
+  }
+
+  static async createPasswordResetToken(email) {
+    // Generate 6-character hex token (3 bytes = 6 hex chars)
+    const token = crypto.randomBytes(3).toString('hex');
+    // Token expires in 1 hour
+    const expiry = new Date(Date.now() + 3600000);
+
+    const result = await pool.query(
+      'UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3 RETURNING email',
+      [token, expiry, email]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    return token;
+  }
+
+  static async verifyResetToken(email, token) {
+    const result = await pool.query(
+      'SELECT id, email, full_name FROM users WHERE email = $1 AND reset_token = $2 AND reset_token_expiry > NOW()',
+      [email, token]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    return result.rows[0];
+  }
+
+  static async resetPasswordWithToken(email, token, newPassword) {
+    // Verify token is valid
+    const user = await this.verifyResetToken(email, token);
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear reset token (one-time use)
+    const result = await pool.query(
+      'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expiry = NULL WHERE id = $2 RETURNING id, email, full_name, phone_number',
+      [hashedPassword, user.id]
+    );
+
     return result.rows[0];
   }
 }

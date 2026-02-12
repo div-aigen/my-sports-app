@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
+const emailService = require('../services/emailService');
 
 const signup = async (req, res) => {
   const errors = validationResult(req);
@@ -127,10 +128,76 @@ const changePassword = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findByEmail(email);
+
+    if (user) {
+      // Generate reset token
+      const resetToken = await User.createPasswordResetToken(email);
+
+      // Send email with reset token
+      try {
+        await emailService.sendPasswordResetEmail(email, resetToken, user.full_name);
+      } catch (emailErr) {
+        console.error('Failed to send password reset email:', emailErr);
+        // Still return success to user for security
+      }
+    }
+
+    // Always return success message to prevent email enumeration attacks
+    res.json({
+      message: 'If that email is registered with us, you will receive a password reset code shortly.',
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    // Still return success message
+    res.json({
+      message: 'If that email is registered with us, you will receive a password reset code shortly.',
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, token, new_password } = req.body;
+
+  try {
+    // Verify token and reset password
+    const user = await User.resetPasswordWithToken(email, token, new_password);
+
+    res.json({
+      message: 'Your password has been reset successfully. You can now login with your new password.',
+      user,
+    });
+  } catch (err) {
+    console.error('Reset password error:', err);
+
+    // Generic error message for security
+    res.status(400).json({
+      error: 'Invalid or expired reset code. Please request a new one.',
+    });
+  }
+};
+
 module.exports = {
   signup,
   login,
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };
