@@ -10,7 +10,7 @@ class EmailService {
     try {
       const msg = {
         to: email,
-        from: 'noreply@mysportsapp.com', // Change this to your SendGrid verified sender email
+        from: 'divyanshukatiyar92@gmail.com', // SendGrid verified sender email
         subject: 'Password Reset Code - My Sports App',
         text: textContent,
         html: htmlContent,
