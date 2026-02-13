@@ -26,6 +26,8 @@ const MySessionsScreen = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [joinedCount, setJoinedCount] = useState(0); // Track total joined count
+  const [createdCount, setCreatedCount] = useState(0); // Track total created count
 
   useEffect(() => {
     fetchSessions();
@@ -39,26 +41,33 @@ const MySessionsScreen = () => {
       const fullResponse = await sessionAPI.list(1, 50, 'full');
       const allSessions = [...openResponse.data.sessions, ...fullResponse.data.sessions];
 
+      // Get participation status for all sessions
+      const participationStatus = {};
+      await Promise.all(
+        allSessions.map(async (session) => {
+          try {
+            const participantsRes = await sessionAPI.getParticipants(session.id);
+            participationStatus[session.id] = participantsRes.data.participants.some(
+              (p) => p.user_id === user.id
+            );
+          } catch (err) {
+            participationStatus[session.id] = false;
+          }
+        })
+      );
+
+      // Calculate both counts
+      const joined = allSessions.filter((s) => participationStatus[s.id]);
+      const created = allSessions.filter((s) => s.creator_id === user.id);
+
+      // Update counts
+      setJoinedCount(joined.length);
+      setCreatedCount(created.length);
+
+      // Display filtered sessions based on active tab
       if (activeTab === 'joined') {
-        // Filter sessions user has joined
-        const participationStatus = {};
-        await Promise.all(
-          allSessions.map(async (session) => {
-            try {
-              const participantsRes = await sessionAPI.getParticipants(session.id);
-              participationStatus[session.id] = participantsRes.data.participants.some(
-                (p) => p.user_id === user.id
-              );
-            } catch (err) {
-              participationStatus[session.id] = false;
-            }
-          })
-        );
-        const joined = allSessions.filter((s) => participationStatus[s.id]);
         setSessions(joined);
       } else {
-        // Filter sessions user created
-        const created = allSessions.filter((s) => s.creator_id === user.id);
         setSessions(created);
       }
     } catch (err) {
@@ -275,7 +284,7 @@ const MySessionsScreen = () => {
           onPress={() => setActiveTab('joined')}
         >
           <Text style={[styles.tabText, activeTab === 'joined' && styles.tabTextActive]}>
-            Joined ({sessions.length})
+            Joined ({joinedCount})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -283,7 +292,7 @@ const MySessionsScreen = () => {
           onPress={() => setActiveTab('created')}
         >
           <Text style={[styles.tabText, activeTab === 'created' && styles.tabTextActive]}>
-            Created ({sessions.length})
+            Created ({createdCount})
           </Text>
         </TouchableOpacity>
       </View>
