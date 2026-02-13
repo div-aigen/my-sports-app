@@ -21,9 +21,11 @@ router.post(
     body('location_address').notEmpty().withMessage('Location is required'),
     body('scheduled_date').isISO8601().withMessage('Valid date required'),
     body('scheduled_time').matches(/^\d{2}:\d{2}$/).withMessage('Valid time required (HH:MM)'),
-    body('scheduled_end_time').optional().matches(/^\d{2}:\d{2}$/).withMessage('Valid end time required (HH:MM)'),
+    body('scheduled_end_time').matches(/^\d{2}:\d{2}$/).withMessage('Valid end time required (HH:MM)'),
     body('total_cost').isFloat({ gt: 0 }).withMessage('Total cost must be greater than 0'),
     body('max_participants').optional().isInt({ min: 2, max: 50 }).withMessage('Max participants must be between 2 and 50'),
+    body('sport_type').notEmpty().withMessage('Sport type is required'),
+    body('venue_id').isInt().withMessage('Valid venue ID is required'),
   ],
   sessionController.createSession
 );

@@ -7,8 +7,13 @@ const createSession = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants } = req.body;
+  const { title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, sport_type, venue_id } = req.body;
   const creatorId = req.user.id;
+
+  // Validate required fields for new sessions with venue assignment
+  if (!scheduled_end_time || !sport_type || !venue_id) {
+    return res.status(400).json({ error: 'Sport type, venue, and end time are required' });
+  }
 
   try {
     const session = await Session.create(
@@ -20,7 +25,9 @@ const createSession = async (req, res) => {
       scheduled_time,
       total_cost,
       max_participants || 14,
-      scheduled_end_time || null
+      scheduled_end_time,
+      sport_type,
+      venue_id
     );
 
     res.status(201).json({
@@ -28,6 +35,13 @@ const createSession = async (req, res) => {
       session,
     });
   } catch (err) {
+    // Handle specific error cases
+    if (err.message === 'NO_FIELD_AVAILABLE') {
+      return res.status(409).json({
+        error: 'All fields are booked for this time slot. Please choose a different time or venue.',
+        errorCode: 'NO_FIELD_AVAILABLE'
+      });
+    }
     console.error('Create session error:', err);
     res.status(500).json({ error: 'Failed to create session' });
   }
@@ -94,6 +108,12 @@ const updateSession = async (req, res) => {
   } catch (err) {
     if (err.message === 'Only creator can update session') {
       return res.status(403).json({ error: err.message });
+    }
+    if (err.message === 'FIELD_NOT_AVAILABLE') {
+      return res.status(409).json({
+        error: 'The field is not available at the new time. Please choose a different time.',
+        errorCode: 'FIELD_NOT_AVAILABLE'
+      });
     }
     console.error('Update session error:', err);
     res.status(500).json({ error: 'Failed to update session' });

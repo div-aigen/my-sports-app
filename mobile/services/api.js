@@ -50,6 +50,11 @@ export const authAPI = {
     api.post('/auth/reset-password', { email, token, new_password: newPassword }),
 };
 
+export const venueAPI = {
+  list: () => api.get('/venues'),
+  get: (id) => api.get(`/venues/${id}`),
+};
+
 export const sessionAPI = {
   list: (page = 1, limit = 10, status = 'open', date = null) => {
     const params = { page, limit, status };
@@ -57,7 +62,7 @@ export const sessionAPI = {
     return api.get('/sessions', { params });
   },
   get: (id) => api.get(`/sessions/${id}`),
-  create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14, scheduledEndTime = null) =>
+  create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14, scheduledEndTime = null, sportType = null, venueId = null) =>
     api.post('/sessions', {
       title,
       description,
@@ -67,6 +72,8 @@ export const sessionAPI = {
       scheduled_end_time: scheduledEndTime,
       total_cost: totalCost,
       max_participants: maxParticipants,
+      sport_type: sportType,
+      venue_id: venueId,
     }),
   join: (id) => api.post(`/sessions/${id}/join`),
   leave: (id) => api.delete(`/sessions/${id}/leave`),

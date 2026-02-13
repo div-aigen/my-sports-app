@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/sessions', require('./routes/sessions'));
+app.use('/api/venues', require('./routes/venues'));
 
 // Health check
 app.get('/health', (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,20 +15,12 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { sessionAPI } from '../../../services/api';
-
-// Location and sport data
-const LOCATIONS_AND_SPORTS = {
-  'Harmony Park, Lucknow': ['Cricket', 'Football', 'Pickleball', 'Basketball'],
-  'Central Stadium, Lucknow': ['Cricket', 'Football', 'Tennis', 'Basketball'],
-  'Jai Prakash Park, Lucknow': ['Football', 'Badminton', 'Basketball'],
-  'Ram Manohar Lohia Park, Lucknow': ['Cricket', 'Football', 'Volleyball'],
-  'Railway Sports Ground, Lucknow': ['Cricket', 'Football', 'Tennis'],
-  'Aishbagh Sports Complex, Lucknow': ['Badminton', 'Basketball', 'Volleyball'],
-};
+import { sessionAPI, venueAPI } from '../../../services/api';
 
 const CreateSessionScreen = ({ navigation }) => {
   const theme = useTheme();
+  const [venues, setVenues] = useState([]);
+  const [selectedVenueId, setSelectedVenueId] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -48,7 +40,25 @@ const CreateSessionScreen = ({ navigation }) => {
 
   const timeOptions = ['00:00', '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30', '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'];
 
-  const availableSports = selectedLocation ? LOCATIONS_AND_SPORTS[selectedLocation] : [];
+  // Fetch venues on component mount
+  useEffect(() => {
+    fetchVenues();
+  }, []);
+
+  const fetchVenues = async () => {
+    try {
+      const response = await venueAPI.list();
+      setVenues(response.data.venues);
+    } catch (err) {
+      console.error('Failed to fetch venues:', err);
+      Alert.alert('Error', 'Failed to load venues');
+    }
+  };
+
+  // Get available sports for selected venue
+  const availableSports = selectedVenueId
+    ? venues.find(v => v.id === selectedVenueId)?.available_sports || []
+    : [];
 
   const handleDateChange = (event, selectedDate) => {
     if (Platform.OS === 'android') {
@@ -66,7 +76,7 @@ const CreateSessionScreen = ({ navigation }) => {
   };
 
   const handleCreate = async () => {
-    if (!title || !selectedLocation || !selectedSport || !dateString || !startTime || !endTime || !cost || !maxParticipants) {
+    if (!title || !selectedVenueId || !selectedSport || !dateString || !startTime || !endTime || !cost || !maxParticipants) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
@@ -97,7 +107,7 @@ const CreateSessionScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
-      // Create session with start time and end time
+      // Create session with sport type and venue ID
       const response = await sessionAPI.create(
         title,
         description,
@@ -106,7 +116,9 @@ const CreateSessionScreen = ({ navigation }) => {
         startTime,
         parseFloat(cost),
         maxParts,
-        endTime // Send end time as 8th parameter for backend to store
+        endTime,
+        selectedSport,     // Send sport type
+        selectedVenueId    // Send venue ID
       );
       Alert.alert('Success', 'Session created!', [
         {
@@ -115,7 +127,18 @@ const CreateSessionScreen = ({ navigation }) => {
         },
       ]);
     } catch (err) {
-      Alert.alert('Error', err.response?.data?.error || 'Failed to create session');
+      const errorCode = err.response?.data?.errorCode;
+      const errorMessage = err.response?.data?.error || 'Failed to create session';
+
+      if (errorCode === 'NO_FIELD_AVAILABLE') {
+        Alert.alert(
+          'Field Unavailable',
+          'All fields are booked for this time slot. Try a different time or venue.',
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -323,22 +346,26 @@ const CreateSessionScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={Object.keys(LOCATIONS_AND_SPORTS)}
-            keyExtractor={(item) => item}
+            data={venues}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[
                   styles.modalOption,
-                  selectedLocation === item && styles.modalOptionSelected,
+                  selectedVenueId === item.id && styles.modalOptionSelected,
                   { borderColor: theme.isDark ? '#444' : '#eee' }
                 ]}
                 onPress={() => {
-                  setSelectedLocation(item);
-                  setSelectedSport('');
+                  setSelectedVenueId(item.id);
+                  setSelectedLocation(item.address);
+                  setSelectedSport(''); // Reset sport when venue changes
                   setShowLocationModal(false);
                 }}
               >
-                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item.name}</Text>
+                <Text style={[styles.modalSubtext, { color: theme.isDark ? '#aaa' : '#666' }]}>
+                  {item.available_sports?.join(', ') || 'No sports available'}
+                </Text>
               </TouchableOpacity>
             )}
           />
@@ -614,6 +641,10 @@ const styles = StyleSheet.create({
   },
   modalOptionText: {
     fontSize: 14,
+  },
+  modalSubtext: {
+    fontSize: 12,
+    marginTop: 4,
   },
   datePickerButtons: {
     flexDirection: 'row',
