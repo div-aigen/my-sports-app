@@ -18,6 +18,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { sessionAPI } from '../../../services/api';
+import { checkUserTimeConflict } from '../../utils/sessionUtils';
 import CreateSessionScreen from './CreateSessionScreen';
 
 const SessionsListScreen = ({ navigation = null }) => {
@@ -80,8 +81,18 @@ const SessionsListScreen = ({ navigation = null }) => {
     setRefreshing(false);
   };
 
-  const handleJoinSession = async (sessionId, sessionTitle) => {
+  const handleJoinSession = async (sessionId, sessionTitle, targetSession) => {
     try {
+      // Check for time conflicts with user's other joined sessions
+      const conflictCheck = await checkUserTimeConflict(user.id, targetSession);
+      if (conflictCheck.hasConflict) {
+        Alert.alert(
+          'Time Conflict',
+          "You can't join this session because you are already in another session held in the same time slot."
+        );
+        return;
+      }
+
       await sessionAPI.join(sessionId);
       Alert.alert('Success', `Joined ${sessionTitle}!`);
       fetchSessions(); // Refresh to show updated participant count
@@ -283,7 +294,7 @@ const SessionsListScreen = ({ navigation = null }) => {
             styles.joinButton,
             (userParticipation[item.id] || item.status === 'full') && styles.buttonDisabled
           ]}
-          onPress={() => handleJoinSession(item.id, item.title)}
+          onPress={() => handleJoinSession(item.id, item.title, item)}
           disabled={userParticipation[item.id] || item.status === 'full'}
         >
           <Text style={styles.actionButtonText}>

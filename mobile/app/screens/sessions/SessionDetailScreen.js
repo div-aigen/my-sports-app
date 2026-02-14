@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { sessionAPI } from '../../../services/api';
+import { checkUserTimeConflict } from '../../utils/sessionUtils';
 
 const SessionDetailScreen = ({ route, navigation }) => {
   const { sessionId } = route.params;
@@ -44,6 +45,17 @@ const SessionDetailScreen = ({ route, navigation }) => {
   const handleJoin = async () => {
     setActionLoading(true);
     try {
+      // Check for time conflicts with user's other joined sessions
+      const conflictCheck = await checkUserTimeConflict(user.id, session);
+      if (conflictCheck.hasConflict) {
+        Alert.alert(
+          'Time Conflict',
+          "You can't join this session because you are already in another session held in the same time slot."
+        );
+        setActionLoading(false);
+        return;
+      }
+
       await sessionAPI.join(sessionId);
       await fetchDetails();
       Alert.alert('Success', 'You joined the session!');
