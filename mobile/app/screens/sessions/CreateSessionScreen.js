@@ -16,9 +16,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { sessionAPI, venueAPI } from '../../../services/api';
+import { checkUserCreationConflict } from '../../utils/sessionUtils';
 
 const CreateSessionScreen = ({ navigation }) => {
   const theme = useTheme();
+  const { user } = useContext(AuthContext);
   const [venues, setVenues] = useState([]);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
   const [title, setTitle] = useState('');
@@ -107,6 +109,24 @@ const CreateSessionScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
+      // Create target session object for conflict checking
+      const targetSession = {
+        scheduled_date: dateString,
+        scheduled_time: startTime,
+        scheduled_end_time: endTime,
+      };
+
+      // Check for time conflicts with user's other created sessions
+      const conflictCheck = await checkUserCreationConflict(user.id, targetSession);
+      if (conflictCheck.hasConflict) {
+        Alert.alert(
+          'Time Conflict',
+          "You already have another session scheduled at this time. Please choose a different time slot."
+        );
+        setLoading(false);
+        return;
+      }
+
       // Create session with sport type and venue ID
       const response = await sessionAPI.create(
         title,

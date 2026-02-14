@@ -1,4 +1,4 @@
-import { sessionAPI } from '../services/api';
+import { sessionAPI } from '../../services/api';
 
 /**
  * Convert time string (HH:MM) to minutes since midnight
@@ -75,8 +75,43 @@ export const checkUserTimeConflict = async (userId, targetSession) => {
   }
 };
 
+/**
+ * Check if user has any time conflicts with sessions they have created
+ * Returns { hasConflict: boolean, conflictingSession?: Session }
+ */
+export const checkUserCreationConflict = async (userId, targetSession) => {
+  try {
+    // Fetch all sessions (including all statuses to check all created sessions)
+    const response = await sessionAPI.list(1, 100, 'open', '');
+    const allSessions = response.data.sessions || [];
+
+    // Filter for sessions created by this user
+    const userCreatedSessions = allSessions.filter(
+      (session) => session.creator_id === userId
+    );
+
+    // Check for time conflicts
+    for (const createdSession of userCreatedSessions) {
+      if (timeOverlap(targetSession, createdSession)) {
+        return {
+          hasConflict: true,
+          conflictingSession: createdSession,
+        };
+      }
+    }
+
+    return { hasConflict: false };
+  } catch (err) {
+    console.error('Error checking creation conflict:', err);
+    // If there's an error checking conflicts, allow the creation
+    // (better to fail gracefully than block legitimate creations)
+    return { hasConflict: false };
+  }
+};
+
 export default {
   timeToMinutes,
   timeOverlap,
   checkUserTimeConflict,
+  checkUserCreationConflict,
 };
