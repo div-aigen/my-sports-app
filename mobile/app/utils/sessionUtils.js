@@ -76,26 +76,53 @@ export const checkUserTimeConflict = async (userId, targetSession) => {
 };
 
 /**
- * Check if user has any time conflicts with sessions they have created
+ * Check if user has any time conflicts with sessions they have created or joined
  * Returns { hasConflict: boolean, conflictingSession?: Session }
  */
 export const checkUserCreationConflict = async (userId, targetSession) => {
   try {
-    // Fetch all sessions (including all statuses to check all created sessions)
+    // Fetch all sessions
     const response = await sessionAPI.list(1, 100, 'open', '');
     const allSessions = response.data.sessions || [];
 
-    // Filter for sessions created by this user
+    // Check 1: Filter for sessions created by this user
     const userCreatedSessions = allSessions.filter(
       (session) => session.creator_id === userId
     );
 
-    // Check for time conflicts
+    // Check for time conflicts with created sessions
     for (const createdSession of userCreatedSessions) {
       if (timeOverlap(targetSession, createdSession)) {
         return {
           hasConflict: true,
           conflictingSession: createdSession,
+        };
+      }
+    }
+
+    // Check 2: Filter for sessions user is already joined in
+    const userJoinedSessions = [];
+    for (const session of allSessions) {
+      try {
+        const participantsRes = await sessionAPI.getParticipants(session.id);
+        const isUserJoined = participantsRes.data.participants.some(
+          (p) => p.user_id === userId
+        );
+        if (isUserJoined) {
+          userJoinedSessions.push(session);
+        }
+      } catch (err) {
+        // Skip if error fetching participants
+        continue;
+      }
+    }
+
+    // Check for time conflicts with joined sessions
+    for (const joinedSession of userJoinedSessions) {
+      if (timeOverlap(targetSession, joinedSession)) {
+        return {
+          hasConflict: true,
+          conflictingSession: joinedSession,
         };
       }
     }
