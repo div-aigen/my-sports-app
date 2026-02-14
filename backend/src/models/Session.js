@@ -1,6 +1,19 @@
 const pool = require('../config/database');
 const Field = require('./Field');
 
+/**
+ * Generate a unique 16-character alphanumeric session ID
+ * Format: XXXX-XXXX-XXXX-XXXX (uppercase letters and numbers)
+ */
+function generateSessionId() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let sessionId = '';
+  for (let i = 0; i < 16; i++) {
+    sessionId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return sessionId;
+}
+
 class Session {
   /**
    * Create a new session with automatic field assignment
@@ -42,12 +55,15 @@ class Session {
         assignedFieldId = availableField.id;
       }
 
+      // Generate unique session ID
+      const sessionId = generateSessionId();
+
       // Create session with venue and field information
       const sessionResult = await client.query(
-        `INSERT INTO sessions (creator_id, title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, status, sport_type, venue_id, field_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'open', $10, $11, $12)
+        `INSERT INTO sessions (session_id, creator_id, title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, status, sport_type, venue_id, field_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'open', $11, $12, $13)
          RETURNING *`,
-        [creatorId, title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, maxParticipants, sportType, venueId, assignedFieldId]
+        [sessionId, creatorId, title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, maxParticipants, sportType, venueId, assignedFieldId]
       );
 
       const session = sessionResult.rows[0];
@@ -78,6 +94,18 @@ class Session {
        JOIN users u ON s.creator_id = u.id
        WHERE s.id = $1`,
       [id]
+    );
+    return result.rows[0];
+  }
+
+  static async findBySessionId(sessionId) {
+    const result = await pool.query(
+      `SELECT s.*, u.full_name as creator_name,
+              (SELECT COUNT(*) FROM participants WHERE session_id = s.id AND status = 'active') as participant_count
+       FROM sessions s
+       JOIN users u ON s.creator_id = u.id
+       WHERE s.session_id = $1`,
+      [sessionId]
     );
     return result.rows[0];
   }

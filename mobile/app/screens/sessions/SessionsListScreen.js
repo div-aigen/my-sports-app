@@ -13,6 +13,7 @@ import {
   ImageBackground,
   ScrollView,
   Platform,
+  Share,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -224,6 +225,44 @@ const SessionsListScreen = ({ navigation = null }) => {
     setShowDetailsModal(false);
     setSelectedSession(null);
     setParticipants([]);
+  };
+
+  const handleShareSession = async () => {
+    if (!selectedSession) return;
+
+    try {
+      // Use session_id (alphanumeric) instead of numeric id
+      const sessionLink = `sportsapp://session/${selectedSession.session_id}`;
+      const message = `🏆 Join my ${selectedSession.title} session!\n\n` +
+        `📅 Date: ${formatDateTime(selectedSession.scheduled_date)}\n` +
+        `🕐 Time: ${formatTime(selectedSession.scheduled_time)}\n` +
+        `📍 Location: ${selectedSession.location_address}\n` +
+        `👥 Spots: ${selectedSession.participant_count}/${selectedSession.max_participants}\n` +
+        `💰 Cost: ₹${selectedSession.total_cost}\n\n` +
+        `📱 Tap this link to join:\n${sessionLink}\n\n` +
+        `Session Code: ${selectedSession.session_id}`;
+
+      const result = await Share.share(
+        {
+          message: message,
+          title: `Join ${selectedSession.title}`,
+        },
+        {
+          dialogTitle: 'Invite friends to join',
+        }
+      );
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared via:', result.activityType);
+        } else {
+          console.log('Session shared successfully');
+        }
+      }
+    } catch (err) {
+      console.error('Error sharing session:', err);
+      Alert.alert('Error', 'Failed to share session');
+    }
   };
 
   const handleDateChange = (event, date) => {
@@ -543,6 +582,15 @@ const SessionsListScreen = ({ navigation = null }) => {
                   </View>
                 )}
               </View>
+
+              {/* Invite Button */}
+              <TouchableOpacity
+                style={styles.inviteButton}
+                onPress={handleShareSession}
+              >
+                <Text style={styles.inviteButtonIcon}>🔗</Text>
+                <Text style={styles.inviteButtonText}>Invite Friends</Text>
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
@@ -1001,6 +1049,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#4CAF50',
+  },
+  inviteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2196F3',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginTop: 20,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  inviteButtonIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  inviteButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

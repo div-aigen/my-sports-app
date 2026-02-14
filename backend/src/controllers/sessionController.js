@@ -64,8 +64,17 @@ const listSessions = async (req, res) => {
 
 const getSession = async (req, res) => {
   try {
-    const sessionId = parseInt(req.params.id);
-    const session = await Session.findById(sessionId);
+    const id = req.params.id;
+    let session;
+
+    // Check if ID is numeric (database ID) or alphanumeric (session_id)
+    if (/^\d+$/.test(id)) {
+      // Numeric ID - use findById
+      session = await Session.findById(parseInt(id));
+    } else {
+      // Alphanumeric ID - use findBySessionId
+      session = await Session.findBySessionId(id);
+    }
 
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });

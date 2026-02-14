@@ -10,13 +10,30 @@ const timeToMinutes = (timeString) => {
 };
 
 /**
+ * Normalize date string to YYYY-MM-DD format
+ * Handles both "2026-02-16" and "2026-02-16T00:00:00.000Z" formats
+ */
+const normalizeDate = (dateString) => {
+  if (!dateString) return '';
+  // Extract YYYY-MM-DD from ISO string or keep as is
+  return dateString.split('T')[0];
+};
+
+/**
  * Check if two sessions overlap in time
  * Sessions overlap if they are on the same date and their times overlap
  * Overlap condition: (start1 < end2) AND (end1 > start2)
  */
 const timeOverlap = (session1, session2) => {
+  // Normalize dates to YYYY-MM-DD format for comparison
+  const date1 = normalizeDate(session1.scheduled_date);
+  const date2 = normalizeDate(session2.scheduled_date);
+
+  console.log(`Comparing dates: "${date1}" vs "${date2}"`);
+
   // Sessions must be on the same date
-  if (session1.scheduled_date !== session2.scheduled_date) {
+  if (date1 !== date2) {
+    console.log(`Dates don't match, no overlap`);
     return false;
   }
 
@@ -25,8 +42,12 @@ const timeOverlap = (session1, session2) => {
   const start2 = timeToMinutes(session2.scheduled_time);
   const end2 = timeToMinutes(session2.scheduled_end_time);
 
+  console.log(`Times: ${start1}-${end1} vs ${start2}-${end2}`);
+
   // Overlap: (start1 < end2) AND (end1 > start2)
-  return start1 < end2 && end1 > start2;
+  const overlaps = start1 < end2 && end1 > start2;
+  console.log(`Overlap result: ${overlaps}`);
+  return overlaps;
 };
 
 /**
