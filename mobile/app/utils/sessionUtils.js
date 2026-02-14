@@ -35,9 +35,16 @@ const timeOverlap = (session1, session2) => {
  */
 export const checkUserTimeConflict = async (userId, targetSession) => {
   try {
-    // Fetch all sessions
-    const response = await sessionAPI.list(1, 100, 'open', '');
-    const allSessions = response.data.sessions || [];
+    // Fetch all sessions (both 'open' and 'full' status)
+    const [openResponse, fullResponse] = await Promise.all([
+      sessionAPI.list(1, 100, 'open', ''),
+      sessionAPI.list(1, 100, 'full', ''),
+    ]);
+
+    const allSessions = [
+      ...(openResponse.data.sessions || []),
+      ...(fullResponse.data.sessions || []),
+    ];
 
     // Filter for sessions user is already joined in
     const userJoinedSessions = [];
@@ -81,18 +88,40 @@ export const checkUserTimeConflict = async (userId, targetSession) => {
  */
 export const checkUserCreationConflict = async (userId, targetSession) => {
   try {
-    // Fetch all sessions
-    const response = await sessionAPI.list(1, 100, 'open', '');
-    const allSessions = response.data.sessions || [];
+    console.log('════════════════════════════════════════════');
+    console.log('🔍 CREATION CONFLICT CHECK START');
+    console.log('User ID:', userId);
+    console.log('Target Session:', JSON.stringify(targetSession, null, 2));
+    console.log('════════════════════════════════════════════');
+
+    // Fetch all sessions (both 'open' and 'full' status)
+    const [openResponse, fullResponse] = await Promise.all([
+      sessionAPI.list(1, 100, 'open', ''),
+      sessionAPI.list(1, 100, 'full', ''),
+    ]);
+
+    const allSessions = [
+      ...(openResponse.data.sessions || []),
+      ...(fullResponse.data.sessions || []),
+    ];
+    console.log(`📋 Fetched ${allSessions.length} total sessions (open + full)`);
 
     // Check 1: Filter for sessions created by this user
     const userCreatedSessions = allSessions.filter(
       (session) => session.creator_id === userId
     );
+    console.log(`✏️  User has created ${userCreatedSessions.length} sessions`);
+    userCreatedSessions.forEach((s, i) => {
+      console.log(`   ${i+1}. ${s.scheduled_date} ${s.scheduled_time}-${s.scheduled_end_time} (ID: ${s.id})`);
+    });
 
     // Check for time conflicts with created sessions
     for (const createdSession of userCreatedSessions) {
-      if (timeOverlap(targetSession, createdSession)) {
+      const overlap = timeOverlap(targetSession, createdSession);
+      console.log(`⏰ Checking overlap with created session ${createdSession.id}: ${overlap}`);
+      if (overlap) {
+        console.log('❌ CONFLICT FOUND with created session!');
+        console.log('════════════════════════════════════════════');
         return {
           hasConflict: true,
           conflictingSession: createdSession,
@@ -101,25 +130,52 @@ export const checkUserCreationConflict = async (userId, targetSession) => {
     }
 
     // Check 2: Filter for sessions user is already joined in
+    console.log('🔍 Checking joined sessions...');
     const userJoinedSessions = [];
+    let participantCheckCount = 0;
+    let participantErrorCount = 0;
+
     for (const session of allSessions) {
       try {
+        participantCheckCount++;
         const participantsRes = await sessionAPI.getParticipants(session.id);
-        const isUserJoined = participantsRes.data.participants.some(
+        const participants = participantsRes.data.participants || [];
+
+        console.log(`   Session ${session.id}: ${participants.length} participants`);
+        participants.forEach(p => {
+          console.log(`      - User ${p.user_id} (checking against ${userId})`);
+        });
+
+        const isUserJoined = participants.some(
           (p) => p.user_id === userId
         );
+
         if (isUserJoined) {
+          console.log(`   ✅ User IS joined in session ${session.id}`);
           userJoinedSessions.push(session);
+        } else {
+          console.log(`   ⬜ User NOT joined in session ${session.id}`);
         }
       } catch (err) {
-        // Skip if error fetching participants
+        participantErrorCount++;
+        console.error(`   ⚠️  Error fetching participants for session ${session.id}:`, err.message);
         continue;
       }
     }
 
+    console.log(`👥 Checked ${participantCheckCount} sessions for participants (${participantErrorCount} errors)`);
+    console.log(`🎯 User is joined in ${userJoinedSessions.length} sessions`);
+    userJoinedSessions.forEach((s, i) => {
+      console.log(`   ${i+1}. ${s.scheduled_date} ${s.scheduled_time}-${s.scheduled_end_time} (ID: ${s.id})`);
+    });
+
     // Check for time conflicts with joined sessions
     for (const joinedSession of userJoinedSessions) {
-      if (timeOverlap(targetSession, joinedSession)) {
+      const overlap = timeOverlap(targetSession, joinedSession);
+      console.log(`⏰ Checking overlap with joined session ${joinedSession.id}: ${overlap}`);
+      if (overlap) {
+        console.log('❌ CONFLICT FOUND with joined session!');
+        console.log('════════════════════════════════════════════');
         return {
           hasConflict: true,
           conflictingSession: joinedSession,
@@ -127,9 +183,13 @@ export const checkUserCreationConflict = async (userId, targetSession) => {
       }
     }
 
+    console.log('✅ No conflicts found');
+    console.log('════════════════════════════════════════════');
     return { hasConflict: false };
   } catch (err) {
-    console.error('Error checking creation conflict:', err);
+    console.error('💥 ERROR in checkUserCreationConflict:', err);
+    console.error('Stack:', err.stack);
+    console.log('════════════════════════════════════════════');
     // If there's an error checking conflicts, allow the creation
     // (better to fail gracefully than block legitimate creations)
     return { hasConflict: false };
