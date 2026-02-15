@@ -18,7 +18,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { sessionAPI } from '../../../services/api';
+import { sessionAPI, venueAPI } from '../../../services/api';
 import { checkUserTimeConflict } from '../../utils/sessionUtils';
 import CreateSessionScreen from './CreateSessionScreen';
 
@@ -40,6 +40,10 @@ const SessionsListScreen = ({ navigation = null }) => {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [sessionCode, setSessionCode] = useState('');
   const [codeSearchLoading, setCodeSearchLoading] = useState(false);
+  const [modalActionLoading, setModalActionLoading] = useState(false);
+  const [locationFilter, setLocationFilter] = useState('');
+  const [venues, setVenues] = useState([]);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
   useEffect(() => {
     // Only fetch if filterDate is empty or is a valid date format (YYYY-MM-DD)
@@ -47,12 +51,18 @@ const SessionsListScreen = ({ navigation = null }) => {
     if (filterDate === '' || isValidDate) {
       fetchSessions();
     }
-  }, [status, filterDate]);
+  }, [status, filterDate, locationFilter]);
+
+  useEffect(() => {
+    venueAPI.list()
+      .then(res => setVenues(res.data.venues || []))
+      .catch(() => {});
+  }, []);
 
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await sessionAPI.list(1, 20, status, filterDate);
+      const response = await sessionAPI.list(1, 20, status, filterDate, locationFilter || null);
       const sessionsData = response.data.sessions;
       setSessions(sessionsData);
 
@@ -466,6 +476,29 @@ const SessionsListScreen = ({ navigation = null }) => {
         )}
       </View>
 
+      <View style={styles.locationFilterContainer}>
+        <TouchableOpacity
+          style={[styles.locationDropdownButton, locationFilter && styles.locationDropdownButtonActive]}
+          onPress={() => setShowLocationDropdown(true)}
+        >
+          <Text style={styles.locationFilterIcon}>📍</Text>
+          <Text style={[styles.locationDropdownText, locationFilter && styles.locationDropdownTextActive]} numberOfLines={1}>
+            {locationFilter
+              ? venues.find(v => v.address === locationFilter)?.name || locationFilter
+              : 'All Locations'}
+          </Text>
+          <Text style={styles.locationDropdownChevron}>▾</Text>
+        </TouchableOpacity>
+        {locationFilter !== '' && (
+          <TouchableOpacity
+            style={styles.clearLocationButton}
+            onPress={() => setLocationFilter('')}
+          >
+            <Text style={styles.clearDateText}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {showDatePicker && (
         <Modal
           transparent={true}
@@ -616,6 +649,60 @@ const SessionsListScreen = ({ navigation = null }) => {
                 )}
               </View>
 
+              {/* Action Buttons */}
+              {selectedSession && (() => {
+                const isCreator = selectedSession.creator_id === user.id;
+                const isJoined = userParticipation[selectedSession.id];
+                const isFull = selectedSession.status === 'full';
+
+                if (isCreator) {
+                  return (
+                    <TouchableOpacity
+                      style={[styles.modalActionButton, styles.modalCancelButton, modalActionLoading && styles.buttonDisabled]}
+                      onPress={() => handleCancelSession(selectedSession.id, selectedSession.title)}
+                      disabled={modalActionLoading}
+                    >
+                      <Text style={styles.modalActionButtonText}>Cancel Session</Text>
+                    </TouchableOpacity>
+                  );
+                } else if (isJoined) {
+                  return (
+                    <TouchableOpacity
+                      style={[styles.modalActionButton, styles.modalLeaveButton, modalActionLoading && styles.buttonDisabled]}
+                      onPress={() => handleLeaveSession(selectedSession.id, selectedSession.title)}
+                      disabled={modalActionLoading}
+                    >
+                      <Text style={styles.modalActionButtonText}>
+                        {modalActionLoading ? 'Leaving...' : 'Leave Session'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                } else {
+                  return (
+                    <TouchableOpacity
+                      style={[styles.modalActionButton, styles.modalJoinButton, (isFull || modalActionLoading) && styles.buttonDisabled]}
+                      onPress={async () => {
+                        setModalActionLoading(true);
+                        await handleJoinSession(selectedSession.id, selectedSession.title, selectedSession);
+                        // Refresh participation status
+                        const participantsRes = await sessionAPI.getParticipants(selectedSession.id);
+                        setParticipants(participantsRes.data.participants);
+                        setUserParticipation(prev => ({
+                          ...prev,
+                          [selectedSession.id]: participantsRes.data.participants.some(p => p.user_id === user.id)
+                        }));
+                        setModalActionLoading(false);
+                      }}
+                      disabled={isFull || modalActionLoading}
+                    >
+                      <Text style={styles.modalActionButtonText}>
+                        {modalActionLoading ? 'Joining...' : isFull ? 'Session Full' : 'Join Session'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }
+              })()}
+
               {/* Invite Button */}
               <TouchableOpacity
                 style={styles.inviteButton}
@@ -643,6 +730,48 @@ const SessionsListScreen = ({ navigation = null }) => {
             }
           }}
         />
+      </Modal>
+
+      {/* Location Dropdown Modal */}
+      <Modal
+        visible={showLocationDropdown}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowLocationDropdown(false)}
+      >
+        <TouchableOpacity
+          style={styles.locationModalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLocationDropdown(false)}
+        >
+          <View style={styles.locationModalContent}>
+            <Text style={styles.locationModalTitle}>Filter by Location</Text>
+            <TouchableOpacity
+              style={[styles.locationOption, locationFilter === '' && styles.locationOptionSelected]}
+              onPress={() => { setLocationFilter(''); setShowLocationDropdown(false); }}
+            >
+              <Text style={[styles.locationOptionText, locationFilter === '' && styles.locationOptionTextSelected]}>
+                All Locations
+              </Text>
+              {locationFilter === '' && <Text style={styles.locationOptionCheck}>✓</Text>}
+            </TouchableOpacity>
+            {venues.map((venue) => (
+              <TouchableOpacity
+                key={venue.id}
+                style={[styles.locationOption, locationFilter === venue.address && styles.locationOptionSelected]}
+                onPress={() => { setLocationFilter(venue.address); setShowLocationDropdown(false); }}
+              >
+                <View style={styles.locationOptionContent}>
+                  <Text style={[styles.locationOptionText, locationFilter === venue.address && styles.locationOptionTextSelected]}>
+                    {venue.name}
+                  </Text>
+                  <Text style={styles.locationOptionAddress}>{venue.address}</Text>
+                </View>
+                {locationFilter === venue.address && <Text style={styles.locationOptionCheck}>✓</Text>}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
       </Modal>
 
       {/* Join by Code Modal */}
@@ -845,6 +974,109 @@ const styles = StyleSheet.create({
   },
   datePicker: {
     width: '100%',
+  },
+  locationFilterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  locationDropdownButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#2196F3',
+    gap: 8,
+  },
+  locationDropdownButtonActive: {
+    backgroundColor: '#E3F2FD',
+    borderColor: '#1565C0',
+  },
+  locationFilterIcon: {
+    fontSize: 16,
+  },
+  locationDropdownText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  locationDropdownTextActive: {
+    color: '#1565C0',
+    fontWeight: '600',
+  },
+  locationDropdownChevron: {
+    fontSize: 14,
+    color: '#999',
+  },
+  clearLocationButton: {
+    backgroundColor: '#f44336',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  locationModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  locationModalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 8,
+    width: '100%',
+    maxHeight: '70%',
+  },
+  locationModalTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  locationOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  locationOptionSelected: {
+    backgroundColor: '#E3F2FD',
+  },
+  locationOptionContent: {
+    flex: 1,
+  },
+  locationOptionText: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
+  },
+  locationOptionTextSelected: {
+    color: '#1565C0',
+    fontWeight: '700',
+  },
+  locationOptionAddress: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 2,
+  },
+  locationOptionCheck: {
+    fontSize: 16,
+    color: '#1565C0',
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
   datePickerActions: {
     marginTop: 15,
@@ -1208,6 +1440,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 15,
   },
+  modalActionButton: {
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 4,
+  },
+  modalJoinButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalLeaveButton: {
+    backgroundColor: '#FF9800',
+  },
+  modalCancelButton: {
+    backgroundColor: '#f44336',
+  },
+  modalActionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700',
+  },
   inviteButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1216,7 +1469,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

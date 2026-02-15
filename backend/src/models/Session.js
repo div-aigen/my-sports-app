@@ -139,7 +139,7 @@ class Session {
     return result.rows[0];
   }
 
-  static async findAll(page = 1, limit = 10, status = 'open', date = null) {
+  static async findAll(page = 1, limit = 10, status = 'open', date = null, location = null) {
     let query = `
       SELECT s.*, u.full_name as creator_name,
              (SELECT COUNT(*) FROM participants WHERE session_id = s.id AND status = 'active') as participant_count
@@ -157,6 +157,11 @@ class Session {
     if (date) {
       params.push(date);
       query += ` AND s.scheduled_date = $${params.length}`;
+    }
+
+    if (location) {
+      params.push(`%${location}%`);
+      query += ` AND s.location_address ILIKE $${params.length}`;
     }
 
     query += ` ORDER BY s.scheduled_date DESC, s.scheduled_time DESC`;
