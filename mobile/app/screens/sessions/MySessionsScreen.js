@@ -20,7 +20,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { sessionAPI, venueAPI } from '../../../services/api';
 
 const MySessionsScreen = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [sessions, setSessions] = useState([]);
@@ -304,9 +304,6 @@ const MySessionsScreen = () => {
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>My Sessions</Text>
           <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}!</Text>
         </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>

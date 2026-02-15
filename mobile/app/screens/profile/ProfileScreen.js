@@ -14,12 +14,14 @@ import {
   Switch,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import api from '../../../services/api';
 
 const ProfileScreen = () => {
   const { user, logout } = useContext(AuthContext);
+  const router = useRouter();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -101,7 +103,7 @@ const ProfileScreen = () => {
       {
         text: 'Logout',
         style: 'destructive',
-        onPress: logout,
+        onPress: async () => { await logout(); router.replace('/'); },
       },
     ]);
   };
