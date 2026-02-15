@@ -14,6 +14,7 @@ import {
   ScrollView,
   Platform,
   Share,
+  Linking,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -580,10 +581,25 @@ const SessionsListScreen = ({ navigation = null }) => {
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.infoGrid}>
-                <View style={styles.infoCard}>
-                  <Text style={styles.infoCardLabel}>📍 Location</Text>
-                  <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
-                </View>
+                {(() => {
+                  const mapsUrl = venues.find(v => v.address === selectedSession?.location_address)?.maps_url;
+                  return mapsUrl ? (
+                    <TouchableOpacity
+                      style={[styles.infoCard, styles.infoCardTappable]}
+                      onPress={() => Linking.openURL(mapsUrl)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.infoCardLabel}>📍 Location</Text>
+                      <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
+                      <Text style={styles.mapsLinkText}>Open in Maps ↗</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={styles.infoCard}>
+                      <Text style={styles.infoCardLabel}>📍 Location</Text>
+                      <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
+                    </View>
+                  );
+                })()}
 
                 <View style={styles.infoCard}>
                   <Text style={styles.infoCardLabel}>📅 Date</Text>
@@ -1262,6 +1278,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderLeftWidth: 3,
     borderLeftColor: '#2196F3',
+  },
+  infoCardTappable: {
+    borderLeftColor: '#1565C0',
+  },
+  mapsLinkText: {
+    fontSize: 11,
+    color: '#1565C0',
+    fontWeight: '600',
+    marginTop: 4,
   },
   infoCardLabel: {
     fontSize: 12,
