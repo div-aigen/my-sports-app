@@ -214,6 +214,7 @@ const CreateSessionScreen = ({ navigation }) => {
           value={description}
           onChangeText={setDescription}
           multiline
+          maxLength={100}
           editable={!loading}
         />
 

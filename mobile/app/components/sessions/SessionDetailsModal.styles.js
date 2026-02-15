@@ -49,6 +49,10 @@ const styles = StyleSheet.create({
   infoCardTappable: {
     borderLeftColor: '#1565C0',
   },
+  infoCardFullWidth: {
+    flex: 0,
+    width: '100%',
+  },
   mapsLinkText: {
     fontSize: 11,
     color: '#1565C0',

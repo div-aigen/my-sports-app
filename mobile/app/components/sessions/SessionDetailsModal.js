@@ -320,6 +320,13 @@ const SessionDetailsModal = ({
                 <Text style={styles.infoCardLabel}>💰 Total Cost</Text>
                 <Text style={styles.infoCardValue}>₹{session?.total_cost}</Text>
               </View>
+
+              <View style={[styles.infoCard, styles.infoCardFullWidth]}>
+                <Text style={styles.infoCardLabel}>📝 Description</Text>
+                <Text style={styles.infoCardValue}>
+                  {session?.description ? session.description.slice(0, 100) : '-'}
+                </Text>
+              </View>
             </View>
 
             {/* Participants section */}
