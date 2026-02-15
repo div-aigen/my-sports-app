@@ -17,6 +17,7 @@ import {
   Linking,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { sessionAPI, venueAPI } from '../../../services/api';
@@ -26,6 +27,7 @@ import CreateSessionScreen from './CreateSessionScreen';
 const SessionsListScreen = ({ navigation = null }) => {
   const { user, logout } = useContext(AuthContext);
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -560,7 +562,7 @@ const SessionsListScreen = ({ navigation = null }) => {
           keyExtractor={(item) => item.id.toString()}
           style={styles.listContainer}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 8 }]}
         />
       )}
 
@@ -579,7 +581,7 @@ const SessionsListScreen = ({ navigation = null }) => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <View style={styles.infoGrid}>
                 {(() => {
                   const mapsUrl = venues.find(v => v.address === selectedSession?.location_address)?.maps_url;

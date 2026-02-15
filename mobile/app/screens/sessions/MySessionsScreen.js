@@ -11,14 +11,18 @@ import {
   ImageBackground,
   Modal,
   ScrollView,
+  Share,
+  Linking,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { sessionAPI } from '../../../services/api';
+import { sessionAPI, venueAPI } from '../../../services/api';
 
 const MySessionsScreen = () => {
   const { user, logout } = useContext(AuthContext);
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,12 +30,19 @@ const MySessionsScreen = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [participants, setParticipants] = useState([]);
-  const [joinedCount, setJoinedCount] = useState(0); // Track total joined count
-  const [createdCount, setCreatedCount] = useState(0); // Track total created count
+  const [joinedCount, setJoinedCount] = useState(0);
+  const [createdCount, setCreatedCount] = useState(0);
+  const [venues, setVenues] = useState([]);
 
   useEffect(() => {
     fetchSessions();
   }, [activeTab]);
+
+  useEffect(() => {
+    venueAPI.list()
+      .then(res => setVenues(res.data.venues || []))
+      .catch(() => {});
+  }, []);
 
   const fetchSessions = async () => {
     try {
@@ -199,6 +210,26 @@ const MySessionsScreen = () => {
     );
   };
 
+  const handleShareSession = async () => {
+    if (!selectedSession) return;
+    try {
+      const sessionLink = `sportsapp://session/${selectedSession.session_id}`;
+      const message =
+        `🏆 Join my ${selectedSession.title} session!\n\n` +
+        `📅 Date: ${formatDateTime(selectedSession.scheduled_date)}\n` +
+        `🕐 Time: ${formatTime(selectedSession.scheduled_time)}\n` +
+        `📍 Location: ${selectedSession.location_address}\n` +
+        `👥 Spots: ${selectedSession.participant_count}/${selectedSession.max_participants}\n` +
+        `💰 Cost: ₹${selectedSession.total_cost}\n\n` +
+        `🔑 Invite Code: ${selectedSession.invite_code}\n` +
+        `(Open the app → "Join by Code" → enter the code above)\n\n` +
+        `📱 Or tap this link:\n${sessionLink}`;
+      await Share.share({ message, title: `Join ${selectedSession.title}` });
+    } catch (err) {
+      Alert.alert('Error', 'Failed to share session');
+    }
+  };
+
   const renderSession = ({ item }) => (
     <View style={styles.sessionCardContainer}>
       <TouchableOpacity
@@ -338,12 +369,27 @@ const MySessionsScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <View style={styles.infoGrid}>
-                <View style={styles.infoCard}>
-                  <Text style={styles.infoCardLabel}>📍 Location</Text>
-                  <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
-                </View>
+                {(() => {
+                  const mapsUrl = venues.find(v => v.address === selectedSession?.location_address)?.maps_url;
+                  return mapsUrl ? (
+                    <TouchableOpacity
+                      style={[styles.infoCard, styles.infoCardTappable]}
+                      onPress={() => Linking.openURL(mapsUrl)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.infoCardLabel}>📍 Location</Text>
+                      <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
+                      <Text style={styles.mapsLinkText}>Open in Maps ↗</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={styles.infoCard}>
+                      <Text style={styles.infoCardLabel}>📍 Location</Text>
+                      <Text style={styles.infoCardValue}>{selectedSession?.location_address}</Text>
+                    </View>
+                  );
+                })()}
 
                 <View style={styles.infoCard}>
                   <Text style={styles.infoCardLabel}>📅 Date</Text>
@@ -408,6 +454,31 @@ const MySessionsScreen = () => {
                   </View>
                 )}
               </View>
+
+              {/* Action Button */}
+              {selectedSession && (
+                activeTab === 'created' ? (
+                  <TouchableOpacity
+                    style={[styles.modalActionButton, styles.modalCancelButton]}
+                    onPress={() => { handleCloseDetailsModal(); handleCancelSession(selectedSession.id, selectedSession.title); }}
+                  >
+                    <Text style={styles.modalActionButtonText}>Cancel Session</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.modalActionButton, styles.modalLeaveButton]}
+                    onPress={() => { handleCloseDetailsModal(); handleLeaveSession(selectedSession.id, selectedSession.title); }}
+                  >
+                    <Text style={styles.modalActionButtonText}>Leave Session</Text>
+                  </TouchableOpacity>
+                )
+              )}
+
+              {/* Invite Button */}
+              <TouchableOpacity style={styles.inviteButton} onPress={handleShareSession}>
+                <Text style={styles.inviteButtonIcon}>🔗</Text>
+                <Text style={styles.inviteButtonText}>Invite Friends</Text>
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
@@ -748,6 +819,54 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#4CAF50',
+  },
+  infoCardTappable: {
+    borderLeftColor: '#1565C0',
+  },
+  mapsLinkText: {
+    fontSize: 11,
+    color: '#1565C0',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  modalActionButton: {
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 4,
+  },
+  modalLeaveButton: {
+    backgroundColor: '#FF9800',
+  },
+  modalCancelButton: {
+    backgroundColor: '#f44336',
+  },
+  modalActionButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  inviteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2196F3',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginTop: 10,
+    marginBottom: 10,
+    elevation: 4,
+  },
+  inviteButtonIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  inviteButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

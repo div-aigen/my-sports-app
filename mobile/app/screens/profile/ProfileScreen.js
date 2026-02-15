@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Switch,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import api from '../../../services/api';
@@ -20,6 +21,7 @@ import api from '../../../services/api';
 const ProfileScreen = () => {
   const { user, logout } = useContext(AuthContext);
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
@@ -146,7 +148,7 @@ const ProfileScreen = () => {
 
         {/* Account Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
+          <Text style={[styles.sectionTitle, { color: "#ffff" }]}>Account Settings</Text>
 
           <TouchableOpacity
             style={styles.settingItem}
@@ -179,7 +181,7 @@ const ProfileScreen = () => {
 
         {/* App Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
+          <Text style={[styles.sectionTitle, { color: "#ffff" }]}>App Settings</Text>
 
           <View style={[styles.settingItem, { paddingRight: 12 }]}>
             <View style={styles.settingLeft}>
@@ -216,7 +218,7 @@ const ProfileScreen = () => {
 
         {/* Help & Support */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help & Support</Text>
+          <Text style={[styles.sectionTitle, { color: "#ffff" }]}>Help & Support</Text>
 
           <TouchableOpacity
             style={styles.settingItem}
@@ -273,7 +275,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <Text style={styles.modalLabel}>Full Name</Text>
               <TextInput
                 style={styles.modalInput}
@@ -325,7 +327,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <Text style={styles.modalLabel}>Current Password</Text>
               <TextInput
                 style={styles.modalInput}
@@ -388,7 +390,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <Text style={styles.aboutText}>
                 <Text style={styles.aboutBold}>Sports Sessions v1.0.0</Text>
                 {'\n\n'}
@@ -428,7 +430,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView>
+            <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <View style={styles.faqItem}>
                 <Text style={styles.faqQuestion}>How does cost splitting work?</Text>
                 <Text style={styles.faqAnswer}>
