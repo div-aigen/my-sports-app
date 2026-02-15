@@ -62,6 +62,7 @@ export const sessionAPI = {
     return api.get('/sessions', { params });
   },
   get: (id) => api.get(`/sessions/${id}`),
+  getByCode: (code) => api.get(`/sessions/${code}`),
   create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost, maxParticipants = 14, scheduledEndTime = null, sportType = null, venueId = null) =>
     api.post('/sessions', {
       title,

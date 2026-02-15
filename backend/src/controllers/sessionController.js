@@ -67,12 +67,14 @@ const getSession = async (req, res) => {
     const id = req.params.id;
     let session;
 
-    // Check if ID is numeric (database ID) or alphanumeric (session_id)
     if (/^\d+$/.test(id)) {
-      // Numeric ID - use findById
+      // Numeric - database primary key
       session = await Session.findById(parseInt(id));
+    } else if (/^[A-Za-z]{6}$/.test(id)) {
+      // 6 letters - invite code
+      session = await Session.findByInviteCode(id);
     } else {
-      // Alphanumeric ID - use findBySessionId
+      // Otherwise - session_id (xxxx-xxxx-xxxx-xxxx format)
       session = await Session.findBySessionId(id);
     }
 

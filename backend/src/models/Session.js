@@ -3,15 +3,31 @@ const Field = require('./Field');
 
 /**
  * Generate a unique 16-character alphanumeric session ID
- * Format: XXXX-XXXX-XXXX-XXXX (uppercase letters and numbers)
+ * Format: xxxx-xxxx-xxxx-xxxx (lowercase letters and numbers with hyphens)
  */
 function generateSessionId() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   let sessionId = '';
   for (let i = 0; i < 16; i++) {
     sessionId += chars.charAt(Math.floor(Math.random() * chars.length));
+    if ((i + 1) % 4 === 0 && i !== 15) {
+      sessionId += '-';
+    }
   }
   return sessionId;
+}
+
+/**
+ * Generate a short 6-character uppercase alphabet invite code
+ * Format: XXXXXX (e.g., ABCDEF) - easy to share verbally or type
+ */
+function generateInviteCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 class Session {
@@ -55,15 +71,16 @@ class Session {
         assignedFieldId = availableField.id;
       }
 
-      // Generate unique session ID
+      // Generate unique IDs
       const sessionId = generateSessionId();
+      const inviteCode = generateInviteCode();
 
       // Create session with venue and field information
       const sessionResult = await client.query(
-        `INSERT INTO sessions (session_id, creator_id, title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, status, sport_type, venue_id, field_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'open', $11, $12, $13)
+        `INSERT INTO sessions (session_id, invite_code, creator_id, title, description, location_address, scheduled_date, scheduled_time, scheduled_end_time, total_cost, max_participants, status, sport_type, venue_id, field_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'open', $12, $13, $14)
          RETURNING *`,
-        [sessionId, creatorId, title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, maxParticipants, sportType, venueId, assignedFieldId]
+        [sessionId, inviteCode, creatorId, title, description, locationAddress, scheduledDate, scheduledTime, scheduledEndTime, totalCost, maxParticipants, sportType, venueId, assignedFieldId]
       );
 
       const session = sessionResult.rows[0];
@@ -106,6 +123,18 @@ class Session {
        JOIN users u ON s.creator_id = u.id
        WHERE s.session_id = $1`,
       [sessionId]
+    );
+    return result.rows[0];
+  }
+
+  static async findByInviteCode(inviteCode) {
+    const result = await pool.query(
+      `SELECT s.*, u.full_name as creator_name,
+              (SELECT COUNT(*) FROM participants WHERE session_id = s.id AND status = 'active') as participant_count
+       FROM sessions s
+       JOIN users u ON s.creator_id = u.id
+       WHERE s.invite_code = $1`,
+      [inviteCode.toUpperCase()]
     );
     return result.rows[0];
   }

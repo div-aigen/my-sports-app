@@ -37,6 +37,9 @@ const SessionsListScreen = ({ navigation = null }) => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [sessionCode, setSessionCode] = useState('');
+  const [codeSearchLoading, setCodeSearchLoading] = useState(false);
 
   useEffect(() => {
     // Only fetch if filterDate is empty or is a valid date format (YYYY-MM-DD)
@@ -227,11 +230,37 @@ const SessionsListScreen = ({ navigation = null }) => {
     setParticipants([]);
   };
 
+  const handleJoinByCode = async () => {
+    const code = sessionCode.trim().toLowerCase();
+    if (!code) {
+      Alert.alert('Error', 'Please enter a session code');
+      return;
+    }
+
+    setCodeSearchLoading(true);
+    try {
+      const response = await sessionAPI.getByCode(code);
+      const session = response.data.session;
+
+      // Close code modal and show session details
+      setShowCodeModal(false);
+      setSessionCode('');
+      await handleShowSessionDetails(session);
+    } catch (err) {
+      if (err.response?.status === 404) {
+        Alert.alert('Not Found', 'No session found with that code. Please check and try again.');
+      } else {
+        Alert.alert('Error', 'Failed to find session. Please try again.');
+      }
+    } finally {
+      setCodeSearchLoading(false);
+    }
+  };
+
   const handleShareSession = async () => {
     if (!selectedSession) return;
 
     try {
-      // Use session_id (alphanumeric) instead of numeric id
       const sessionLink = `sportsapp://session/${selectedSession.session_id}`;
       const message = `🏆 Join my ${selectedSession.title} session!\n\n` +
         `📅 Date: ${formatDateTime(selectedSession.scheduled_date)}\n` +
@@ -239,8 +268,9 @@ const SessionsListScreen = ({ navigation = null }) => {
         `📍 Location: ${selectedSession.location_address}\n` +
         `👥 Spots: ${selectedSession.participant_count}/${selectedSession.max_participants}\n` +
         `💰 Cost: ₹${selectedSession.total_cost}\n\n` +
-        `📱 Tap this link to join:\n${sessionLink}\n\n` +
-        `Session Code: ${selectedSession.session_id}`;
+        `🔑 Invite Code: ${selectedSession.invite_code}\n` +
+        `(Open the app → "Join by Code" → enter the code above)\n\n` +
+        `📱 Or tap this link:\n${sessionLink}`;
 
       const result = await Share.share(
         {
@@ -386,8 +416,11 @@ const SessionsListScreen = ({ navigation = null }) => {
           >
             <Text style={styles.createButtonText}>+ Create</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
+          <TouchableOpacity
+            style={styles.codeButton}
+            onPress={() => setShowCodeModal(true)}
+          >
+            <Text style={styles.codeButtonText}>Join by Code</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -610,6 +643,51 @@ const SessionsListScreen = ({ navigation = null }) => {
             }
           }}
         />
+      </Modal>
+
+      {/* Join by Code Modal */}
+      <Modal
+        visible={showCodeModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => { setShowCodeModal(false); setSessionCode(''); }}
+      >
+        <View style={styles.codeModalOverlay}>
+          <View style={styles.codeModalContent}>
+            <Text style={styles.codeModalTitle}>Join by Code</Text>
+            <Text style={styles.codeModalSubtitle}>
+              Enter the session code shared with you
+            </Text>
+            <TextInput
+              style={styles.codeInput}
+              value={sessionCode}
+              onChangeText={(text) => setSessionCode(text.toUpperCase())}
+              placeholder="e.g. ABCDEF"
+              placeholderTextColor="#aaa"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={6}
+              autoFocus={true}
+            />
+            <View style={styles.codeModalButtons}>
+              <TouchableOpacity
+                style={styles.codeModalCancel}
+                onPress={() => { setShowCodeModal(false); setSessionCode(''); }}
+              >
+                <Text style={styles.codeModalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.codeModalConfirm, codeSearchLoading && styles.buttonDisabled]}
+                onPress={handleJoinByCode}
+                disabled={codeSearchLoading}
+              >
+                <Text style={styles.codeModalConfirmText}>
+                  {codeSearchLoading ? 'Searching...' : 'Find Session'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -1049,6 +1127,86 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#4CAF50',
+  },
+  codeButton: {
+    backgroundColor: '#9C27B0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    flex: 1,
+  },
+  codeButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    textAlign: 'center',
+    fontSize: 13,
+  },
+  codeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  codeModalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+  },
+  codeModalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  codeModalSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  codeInput: {
+    borderWidth: 1.5,
+    borderColor: '#9C27B0',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    fontSize: 18,
+    letterSpacing: 1,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  codeModalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  codeModalCancel: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#ddd',
+    alignItems: 'center',
+  },
+  codeModalCancelText: {
+    color: '#666',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  codeModalConfirm: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 10,
+    backgroundColor: '#9C27B0',
+    alignItems: 'center',
+  },
+  codeModalConfirmText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 15,
   },
   inviteButton: {
     flexDirection: 'row',

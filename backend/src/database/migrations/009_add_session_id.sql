@@ -1,5 +1,6 @@
 -- Add session_id column to sessions table
-ALTER TABLE sessions ADD COLUMN IF NOT EXISTS session_id VARCHAR(16) UNIQUE;
+-- Format: xxxx-xxxx-xxxx-xxxx (19 chars including hyphens)
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS session_id VARCHAR(19) UNIQUE;
 
 -- Create index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON sessions(session_id);
