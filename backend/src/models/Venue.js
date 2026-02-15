@@ -15,11 +15,12 @@ class Venue {
         v.city,
         v.description,
         v.status,
+        v.maps_url,
         ARRAY_AGG(DISTINCT f.sport_type ORDER BY f.sport_type) as available_sports
       FROM venues v
       LEFT JOIN fields f ON v.id = f.venue_id AND f.status = 'available'
       WHERE v.status = 'active'
-      GROUP BY v.id, v.name, v.address, v.city, v.description, v.status
+      GROUP BY v.id, v.name, v.address, v.city, v.description, v.status, v.maps_url
       ORDER BY v.name
     `;
 
