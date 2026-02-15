@@ -37,7 +37,7 @@ const SignupScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Football App</Text>
+        <Text style={styles.title}>Lineup</Text>
         <Text style={styles.subtitle}>Create your account</Text>
       </View>
 
