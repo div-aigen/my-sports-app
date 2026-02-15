@@ -77,7 +77,7 @@ const LoginScreen = ({ showSignup = false }) => {
       )}
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
-        <Text style={[styles.title, { color: 'rgba(255,255,255,1)' }]}>My Sports App</Text>
+        <Text style={[styles.title, { color: 'rgba(255,255,255,1)' }]}>Lineup</Text>
         <Text style={[styles.subtitle, { color: '#ffffff' }]}>Find your game in Lucknow</Text>
       </View>
 
