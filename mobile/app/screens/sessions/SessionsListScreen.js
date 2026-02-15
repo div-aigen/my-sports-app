@@ -746,30 +746,32 @@ const SessionsListScreen = ({ navigation = null }) => {
         >
           <View style={styles.locationModalContent}>
             <Text style={styles.locationModalTitle}>Filter by Location</Text>
-            <TouchableOpacity
-              style={[styles.locationOption, locationFilter === '' && styles.locationOptionSelected]}
-              onPress={() => { setLocationFilter(''); setShowLocationDropdown(false); }}
-            >
-              <Text style={[styles.locationOptionText, locationFilter === '' && styles.locationOptionTextSelected]}>
-                All Locations
-              </Text>
-              {locationFilter === '' && <Text style={styles.locationOptionCheck}>✓</Text>}
-            </TouchableOpacity>
-            {venues.map((venue) => (
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
               <TouchableOpacity
-                key={venue.id}
-                style={[styles.locationOption, locationFilter === venue.address && styles.locationOptionSelected]}
-                onPress={() => { setLocationFilter(venue.address); setShowLocationDropdown(false); }}
+                style={[styles.locationOption, locationFilter === '' && styles.locationOptionSelected]}
+                onPress={() => { setLocationFilter(''); setShowLocationDropdown(false); }}
               >
-                <View style={styles.locationOptionContent}>
-                  <Text style={[styles.locationOptionText, locationFilter === venue.address && styles.locationOptionTextSelected]}>
-                    {venue.name}
-                  </Text>
-                  <Text style={styles.locationOptionAddress}>{venue.address}</Text>
-                </View>
-                {locationFilter === venue.address && <Text style={styles.locationOptionCheck}>✓</Text>}
+                <Text style={[styles.locationOptionText, locationFilter === '' && styles.locationOptionTextSelected]}>
+                  All Locations
+                </Text>
+                {locationFilter === '' && <Text style={styles.locationOptionCheck}>✓</Text>}
               </TouchableOpacity>
-            ))}
+              {venues.map((venue) => (
+                <TouchableOpacity
+                  key={venue.id}
+                  style={[styles.locationOption, locationFilter === venue.address && styles.locationOptionSelected]}
+                  onPress={() => { setLocationFilter(venue.address); setShowLocationDropdown(false); }}
+                >
+                  <View style={styles.locationOptionContent}>
+                    <Text style={[styles.locationOptionText, locationFilter === venue.address && styles.locationOptionTextSelected]}>
+                      {venue.name}
+                    </Text>
+                    <Text style={styles.locationOptionAddress}>{venue.address}</Text>
+                  </View>
+                  {locationFilter === venue.address && <Text style={styles.locationOptionCheck}>✓</Text>}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </TouchableOpacity>
       </Modal>
