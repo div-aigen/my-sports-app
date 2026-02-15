@@ -40,26 +40,20 @@ app.get('/health', (req, res) => {
 
 // Socket.io connection
 io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
-
   socket.on('join-session', (sessionId) => {
     socket.join(`session-${sessionId}`);
-    console.log(`User joined session room: session-${sessionId}`);
   });
 
   socket.on('leave-session', (sessionId) => {
     socket.leave(`session-${sessionId}`);
-    console.log(`User left session room: session-${sessionId}`);
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
   });
 });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = { app, io };
