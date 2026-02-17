@@ -45,7 +45,10 @@ const SessionsListScreen = ({ navigation = null }) => {
   const [codeSearchLoading, setCodeSearchLoading] = useState(false);
   const [locationFilter, setLocationFilter] = useState('');
   const [venues, setVenues] = useState([]);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [sportFilter, setSportFilter] = useState('');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showSportPicker, setShowSportPicker] = useState(false);
 
   useEffect(() => {
     // Only fetch if filterDate is empty or is a valid date format (YYYY-MM-DD)
@@ -53,7 +56,7 @@ const SessionsListScreen = ({ navigation = null }) => {
     if (filterDate === '' || isValidDate) {
       fetchSessions();
     }
-  }, [status, filterDate, locationFilter]);
+  }, [status, filterDate, locationFilter, sportFilter]);
 
   useEffect(() => {
     venueAPI.list()
@@ -64,7 +67,7 @@ const SessionsListScreen = ({ navigation = null }) => {
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await sessionAPI.list(1, 20, status, filterDate, locationFilter || null);
+      const response = await sessionAPI.list(1, 20, status, filterDate, locationFilter || null, sportFilter || null);
       const sessionsData = response.data.sessions;
       setSessions(sessionsData);
 
@@ -155,6 +158,7 @@ const SessionsListScreen = ({ navigation = null }) => {
   const handleDateChange = (event, date) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
+      if (event.type === 'dismissed') return;
     }
 
     if (date) {
@@ -349,87 +353,25 @@ const SessionsListScreen = ({ navigation = null }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.dateFilterContainer}>
+      <View style={styles.filterBarRow}>
         <TouchableOpacity
-          style={styles.datePickerButton}
-          onPress={handleOpenDatePicker}
+          style={[styles.filterBarButton, (filterDate || locationFilter || sportFilter) && styles.filterBarButtonActive]}
+          onPress={() => setShowFilterModal(true)}
         >
-          <Text style={styles.datePickerIcon}>📅</Text>
-          <Text style={styles.datePickerText}>
-            {filterDate ? formatDate(filterDate) : 'Select Date'}
+          <Text style={styles.filterBarIcon}>⚙</Text>
+          <Text style={[styles.filterBarText, (filterDate || locationFilter || sportFilter) && styles.filterBarTextActive]}>
+            Filters{(filterDate || locationFilter || sportFilter) ? ` (${[filterDate, locationFilter, sportFilter].filter(Boolean).length})` : ''}
           </Text>
         </TouchableOpacity>
-        {filterDate !== '' && (
+        {(filterDate || locationFilter || sportFilter) && (
           <TouchableOpacity
-            style={styles.clearDateButton}
-            onPress={handleClearDate}
+            style={styles.filterBarClear}
+            onPress={() => { setFilterDate(''); setSelectedDate(new Date()); setLocationFilter(''); setSportFilter(''); }}
           >
-            <Text style={styles.clearDateText}>✕</Text>
+            <Text style={styles.clearDateText}>Clear All</Text>
           </TouchableOpacity>
         )}
       </View>
-
-      <View style={styles.locationFilterContainer}>
-        <TouchableOpacity
-          style={[styles.locationDropdownButton, locationFilter && styles.locationDropdownButtonActive]}
-          onPress={() => setShowLocationDropdown(true)}
-        >
-          <Text style={styles.locationFilterIcon}>📍</Text>
-          <Text style={[styles.locationDropdownText, locationFilter && styles.locationDropdownTextActive]} numberOfLines={1}>
-            {locationFilter
-              ? venues.find(v => v.address === locationFilter)?.name || locationFilter
-              : 'All Locations'}
-          </Text>
-          <Text style={styles.locationDropdownChevron}>▾</Text>
-        </TouchableOpacity>
-        {locationFilter !== '' && (
-          <TouchableOpacity
-            style={styles.clearLocationButton}
-            onPress={() => setLocationFilter('')}
-          >
-            <Text style={styles.clearDateText}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {showDatePicker && (
-        <Modal
-          transparent={true}
-          animationType="fade"
-          visible={showDatePicker}
-          onRequestClose={() => setShowDatePicker(false)}
-        >
-          <View style={styles.datePickerModalOverlay}>
-            <View style={styles.datePickerModalContent}>
-              <View style={styles.datePickerHeader}>
-                <Text style={styles.datePickerTitle}>Select Date</Text>
-                {Platform.OS === 'ios' && (
-                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.datePickerDone}>Done</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <DateTimePicker
-                value={selectedDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleDateChange}
-                style={styles.datePicker}
-              />
-              {Platform.OS === 'ios' && (
-                <View style={styles.datePickerActions}>
-                  <TouchableOpacity
-                    style={styles.datePickerClearButton}
-                    onPress={handleClearDate}
-                  >
-                    <Text style={styles.datePickerClearText}>Clear Filter</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-        </Modal>
-      )}
 
       {loading ? (
         <View style={styles.loaderContainer}>
@@ -484,48 +426,147 @@ const SessionsListScreen = ({ navigation = null }) => {
         />
       </Modal>
 
-      {/* Location Dropdown Modal */}
+      {/* Unified Filter Modal */}
       <Modal
-        visible={showLocationDropdown}
-        animationType="fade"
+        visible={showFilterModal}
+        animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowLocationDropdown(false)}
+        onRequestClose={() => setShowFilterModal(false)}
       >
-        <TouchableOpacity
-          style={styles.locationModalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowLocationDropdown(false)}
-        >
-          <View style={styles.locationModalContent}>
-            <Text style={styles.locationModalTitle}>Filter by Location</Text>
-            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-              <TouchableOpacity
-                style={[styles.locationOption, locationFilter === '' && styles.locationOptionSelected]}
-                onPress={() => { setLocationFilter(''); setShowLocationDropdown(false); }}
-              >
-                <Text style={[styles.locationOptionText, locationFilter === '' && styles.locationOptionTextSelected]}>
-                  All Locations
-                </Text>
-                {locationFilter === '' && <Text style={styles.locationOptionCheck}>✓</Text>}
+        <View style={styles.filterModalOverlay}>
+          <View style={styles.filterModalContent}>
+            <View style={styles.filterModalHeader}>
+              <Text style={styles.filterModalTitle}>Filters</Text>
+              <TouchableOpacity onPress={() => setShowFilterModal(false)}>
+                <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
-              {venues.map((venue) => (
+            </View>
+
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+              {/* Date Filter */}
+              <Text style={styles.filterSectionLabel}>📅 Date</Text>
+              <View style={styles.filterSectionRow}>
                 <TouchableOpacity
-                  key={venue.id}
-                  style={[styles.locationOption, locationFilter === venue.address && styles.locationOptionSelected]}
-                  onPress={() => { setLocationFilter(venue.address); setShowLocationDropdown(false); }}
+                  style={[styles.filterSectionButton, filterDate && styles.filterSectionButtonActive]}
+                  onPress={handleOpenDatePicker}
                 >
-                  <View style={styles.locationOptionContent}>
-                    <Text style={[styles.locationOptionText, locationFilter === venue.address && styles.locationOptionTextSelected]}>
-                      {venue.name}
-                    </Text>
-                    <Text style={styles.locationOptionAddress}>{venue.address}</Text>
-                  </View>
-                  {locationFilter === venue.address && <Text style={styles.locationOptionCheck}>✓</Text>}
+                  <Text style={[styles.filterSectionButtonText, filterDate && styles.filterSectionButtonTextActive]}>
+                    {filterDate ? formatDate(filterDate) : 'Any Date'}
+                  </Text>
                 </TouchableOpacity>
-              ))}
+                {filterDate !== '' && (
+                  <TouchableOpacity onPress={handleClearDate}>
+                    <Text style={styles.filterSectionClear}>Clear</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {showDatePicker && (
+                <View style={styles.filterDatePickerContainer}>
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, date) => {
+                      handleDateChange(event, date);
+                      if (Platform.OS === 'android') setShowDatePicker(false);
+                    }}
+                    style={styles.datePicker}
+                  />
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                      <Text style={styles.filterSectionClear}>Done</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
+              {/* Location Filter */}
+              <Text style={styles.filterSectionLabel}>📍 Location</Text>
+              <TouchableOpacity
+                style={[styles.dropdownTrigger, locationFilter && styles.dropdownTriggerActive]}
+                onPress={() => { setShowLocationPicker(!showLocationPicker); setShowSportPicker(false); }}
+              >
+                <Text style={[styles.dropdownTriggerText, locationFilter && styles.dropdownTriggerTextActive]} numberOfLines={1}>
+                  {locationFilter ? venues.find(v => v.address === locationFilter)?.name || locationFilter : 'All Locations'}
+                </Text>
+                <Text style={styles.dropdownChevron}>{showLocationPicker ? '▴' : '▾'}</Text>
+              </TouchableOpacity>
+              {showLocationPicker && (
+                <View style={styles.dropdownList}>
+                  <ScrollView nestedScrollEnabled bounces={false} showsVerticalScrollIndicator={true}>
+                    <TouchableOpacity
+                      style={[styles.dropdownOption, !locationFilter && styles.dropdownOptionActive]}
+                      onPress={() => { setLocationFilter(''); setShowLocationPicker(false); }}
+                    >
+                      <Text style={[styles.dropdownOptionText, !locationFilter && styles.dropdownOptionTextActive]}>All Locations</Text>
+                      {!locationFilter && <Text style={styles.dropdownCheck}>✓</Text>}
+                    </TouchableOpacity>
+                    {venues.map((venue) => (
+                      <TouchableOpacity
+                        key={venue.id}
+                        style={[styles.dropdownOption, locationFilter === venue.address && styles.dropdownOptionActive]}
+                        onPress={() => { setLocationFilter(venue.address); setShowLocationPicker(false); }}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.dropdownOptionText, locationFilter === venue.address && styles.dropdownOptionTextActive]}>
+                            {venue.name}
+                          </Text>
+                          <Text style={styles.dropdownOptionSubtext}>{venue.address}</Text>
+                        </View>
+                        {locationFilter === venue.address && <Text style={styles.dropdownCheck}>✓</Text>}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Sport Filter */}
+              <Text style={styles.filterSectionLabel}>🏅 Sport</Text>
+              <TouchableOpacity
+                style={[styles.dropdownTrigger, sportFilter && styles.dropdownTriggerActive]}
+                onPress={() => { setShowSportPicker(!showSportPicker); setShowLocationPicker(false); }}
+              >
+                <Text style={[styles.dropdownTriggerText, sportFilter && styles.dropdownTriggerTextActive]}>
+                  {sportFilter || 'All Sports'}
+                </Text>
+                <Text style={styles.dropdownChevron}>{showSportPicker ? '▴' : '▾'}</Text>
+              </TouchableOpacity>
+              {showSportPicker && (
+                <View style={styles.dropdownList}>
+                  <ScrollView nestedScrollEnabled bounces={false} showsVerticalScrollIndicator={true}>
+                    <TouchableOpacity
+                      style={[styles.dropdownOption, !sportFilter && styles.dropdownOptionActive]}
+                      onPress={() => { setSportFilter(''); setShowSportPicker(false); }}
+                    >
+                      <Text style={[styles.dropdownOptionText, !sportFilter && styles.dropdownOptionTextActive]}>All Sports</Text>
+                      {!sportFilter && <Text style={styles.dropdownCheck}>✓</Text>}
+                    </TouchableOpacity>
+                    {[...new Set(venues.flatMap(v => v.available_sports || []))].sort().map((sport) => (
+                      <TouchableOpacity
+                        key={sport}
+                        style={[styles.dropdownOption, sportFilter === sport && styles.dropdownOptionActive]}
+                        onPress={() => { setSportFilter(sport); setShowSportPicker(false); }}
+                      >
+                        <Text style={[styles.dropdownOptionText, sportFilter === sport && styles.dropdownOptionTextActive]}>
+                          {sport}
+                        </Text>
+                        {sportFilter === sport && <Text style={styles.dropdownCheck}>✓</Text>}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
             </ScrollView>
+
+            <TouchableOpacity
+              style={styles.filterModalApply}
+              onPress={() => setShowFilterModal(false)}
+            >
+              <Text style={styles.filterModalApplyText}>Apply Filters</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       {/* Join by Code Modal */}

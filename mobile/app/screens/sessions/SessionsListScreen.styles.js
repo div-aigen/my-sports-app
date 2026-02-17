@@ -83,193 +83,206 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '500',
   },
-  dateFilterContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    alignItems: 'center',
-    gap: 8,
-  },
-  datePickerButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#2196F3',
-    gap: 10,
-  },
-  datePickerIcon: {
-    fontSize: 20,
-  },
-  datePickerText: {
-    fontSize: 15,
-    color: '#333',
-    fontWeight: '500',
-  },
-  clearDateButton: {
-    backgroundColor: '#f44336',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
   clearDateText: {
     color: 'white',
     fontWeight: '600',
-    fontSize: 16,
-  },
-  datePickerModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  datePickerModalContent: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
-  },
-  datePickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  datePickerDone: {
-    fontSize: 16,
-    color: '#2196F3',
-    fontWeight: '600',
+    fontSize: 13,
   },
   datePicker: {
     width: '100%',
   },
-  locationFilterContainer: {
+  filterBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
     gap: 8,
   },
-  locationDropdownButton: {
+  filterBarButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'white',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#2196F3',
-    gap: 8,
+    gap: 6,
   },
-  locationDropdownButtonActive: {
+  filterBarButtonActive: {
     backgroundColor: '#E3F2FD',
     borderColor: '#1565C0',
   },
-  locationFilterIcon: {
+  filterBarIcon: {
     fontSize: 16,
   },
-  locationDropdownText: {
-    flex: 1,
+  filterBarText: {
     fontSize: 14,
     color: '#666',
     fontWeight: '500',
   },
-  locationDropdownTextActive: {
+  filterBarTextActive: {
     color: '#1565C0',
     fontWeight: '600',
   },
-  locationDropdownChevron: {
-    fontSize: 14,
-    color: '#999',
-  },
-  clearLocationButton: {
+  filterBarClear: {
     backgroundColor: '#f44336',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 8,
   },
-  locationModalOverlay: {
+  filterModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
+    justifyContent: 'flex-end',
   },
-  locationModalContent: {
+  filterModalContent: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 8,
-    width: '100%',
-    maxHeight: '70%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '75%',
   },
-  locationModalTitle: {
-    fontSize: 16,
+  filterModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterModalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
-  locationOption: {
+  closeButton: {
+    fontSize: 24,
+    color: '#666',
+    fontWeight: '300',
+    paddingLeft: 10,
+  },
+  filterSectionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#333',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  filterSectionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    gap: 8,
   },
-  locationOptionSelected: {
+  filterSectionButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    marginBottom: 6,
+  },
+  filterSectionButtonActive: {
     backgroundColor: '#E3F2FD',
   },
-  locationOptionContent: {
-    flex: 1,
-  },
-  locationOptionText: {
-    fontSize: 15,
-    color: '#333',
+  filterSectionButtonText: {
+    fontSize: 14,
+    color: '#666',
     fontWeight: '500',
   },
-  locationOptionTextSelected: {
+  filterSectionButtonTextActive: {
     color: '#1565C0',
     fontWeight: '700',
   },
-  locationOptionAddress: {
-    fontSize: 12,
+  filterSectionClear: {
+    fontSize: 14,
+    color: '#2196F3',
+    fontWeight: '600',
+  },
+  filterDatePickerContainer: {
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  filterModalApply: {
+    backgroundColor: '#2196F3',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  filterModalApplyText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  dropdownTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  dropdownTriggerActive: {
+    backgroundColor: '#E3F2FD',
+    borderColor: '#1565C0',
+  },
+  dropdownTriggerText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+    flex: 1,
+  },
+  dropdownTriggerTextActive: {
+    color: '#1565C0',
+    fontWeight: '700',
+  },
+  dropdownChevron: {
+    fontSize: 14,
+    color: '#999',
+    marginLeft: 8,
+  },
+  dropdownList: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginTop: 6,
+    maxHeight: 180,
+    overflow: 'hidden',
+  },
+  dropdownOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  dropdownOptionActive: {
+    backgroundColor: '#E3F2FD',
+  },
+  dropdownOptionText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  dropdownOptionTextActive: {
+    color: '#1565C0',
+    fontWeight: '700',
+  },
+  dropdownOptionSubtext: {
+    fontSize: 11,
     color: '#999',
     marginTop: 2,
   },
-  locationOptionCheck: {
-    fontSize: 16,
+  dropdownCheck: {
+    fontSize: 14,
     color: '#1565C0',
     fontWeight: 'bold',
     marginLeft: 8,
-  },
-  datePickerActions: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  datePickerClearButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#f44336',
-    borderRadius: 8,
-  },
-  datePickerClearText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 14,
   },
   listContainer: {
     flex: 1,

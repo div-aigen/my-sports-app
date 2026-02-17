@@ -54,8 +54,9 @@ const listSessions = async (req, res) => {
     const status = req.query.status || 'open';
     const date = req.query.date || null;
     const location = req.query.location || null;
+    const sportType = req.query.sport_type || null;
 
-    const sessions = await Session.findAll(page, limit, status, date, location);
+    const sessions = await Session.findAll(page, limit, status, date, location, sportType);
     res.json({ sessions });
   } catch (err) {
     console.error('List sessions error:', err);

@@ -54,10 +54,11 @@ export const venueAPI = {
 };
 
 export const sessionAPI = {
-  list: (page = 1, limit = 10, status = 'open', date = null, location = null) => {
+  list: (page = 1, limit = 10, status = 'open', date = null, location = null, sportType = null) => {
     const params = { page, limit, status };
     if (date) params.date = date;
     if (location) params.location = location;
+    if (sportType) params.sport_type = sportType;
     return api.get('/sessions', { params });
   },
   get: (id) => api.get(`/sessions/${id}`),
