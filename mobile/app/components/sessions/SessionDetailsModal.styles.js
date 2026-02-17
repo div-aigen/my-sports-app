@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: '44%',
     backgroundColor: '#f8f9fa',
     padding: 12,
     borderRadius: 12,
@@ -68,6 +68,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#333',
     fontWeight: '600',
+  },
+  infoCardSubtext: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 2,
   },
   participantsSection: {
     marginBottom: 20,

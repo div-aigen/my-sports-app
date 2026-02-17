@@ -296,6 +296,11 @@ const SessionDetailsModal = ({
                 <Text style={styles.infoCardValue}>
                   {session?.scheduled_date ? formatDateTime(session.scheduled_date) : ''}
                 </Text>
+                {session?.scheduled_date && (
+                  <Text style={styles.infoCardSubtext}>
+                    {new Date(session.scheduled_date).toLocaleDateString('en-US', { weekday: 'long' })}
+                  </Text>
+                )}
               </View>
 
               <View style={styles.infoCard}>
@@ -319,6 +324,11 @@ const SessionDetailsModal = ({
               <View style={styles.infoCard}>
                 <Text style={styles.infoCardLabel}>💰 Total Cost</Text>
                 <Text style={styles.infoCardValue}>₹{session?.total_cost}</Text>
+              </View>
+
+              <View style={styles.infoCard}>
+                <Text style={styles.infoCardLabel}>🏅 Sport</Text>
+                <Text style={styles.infoCardValue}>{session?.sport_type || '-'}</Text>
               </View>
 
               <View style={[styles.infoCard, styles.infoCardFullWidth]}>
