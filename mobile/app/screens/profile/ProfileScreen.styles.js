@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   profileCard: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
     marginHorizontal: 16,
     marginTop: 20,
     borderRadius: 16,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   settingItem: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,

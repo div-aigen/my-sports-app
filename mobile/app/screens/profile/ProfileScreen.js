@@ -160,7 +160,7 @@ const ProfileScreen = () => {
               <Text style={styles.settingIcon}>👤</Text>
               <View>
                 <Text style={styles.settingLabel}>Edit Profile</Text>
-                <Text style={styles.settingDesc}>Update your information</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>Update your information</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>
@@ -174,7 +174,7 @@ const ProfileScreen = () => {
               <Text style={styles.settingIcon}>🔒</Text>
               <View>
                 <Text style={styles.settingLabel}>Change Password</Text>
-                <Text style={styles.settingDesc}>Secure your account</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>Secure your account</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>
@@ -211,7 +211,7 @@ const ProfileScreen = () => {
               <Text style={styles.settingIcon}>ℹ️</Text>
               <View>
                 <Text style={styles.settingLabel}>About App</Text>
-                <Text style={styles.settingDesc}>Version 1.0.0</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>Version 1.0.0</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>
@@ -230,7 +230,7 @@ const ProfileScreen = () => {
               <Text style={styles.settingIcon}>❓</Text>
               <View>
                 <Text style={styles.settingLabel}>FAQ</Text>
-                <Text style={styles.settingDesc}>Frequently asked questions</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>Frequently asked questions</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>
@@ -241,7 +241,7 @@ const ProfileScreen = () => {
               <Text style={styles.settingIcon}>💬</Text>
               <View>
                 <Text style={styles.settingLabel}>Contact Support</Text>
-                <Text style={styles.settingDesc}>Get help from our team</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>Get help from our team</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>

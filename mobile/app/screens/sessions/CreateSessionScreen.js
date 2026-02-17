@@ -207,167 +207,206 @@ const CreateSessionScreen = ({ navigation }) => {
         </ImageBackground>
       )}
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={[styles.header, { backgroundColor: theme.isDark ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)' }]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={[styles.backButtonBox, { borderColor: theme.colors.text }]}
-        >
-          <Text style={[styles.backButton, { color: theme.colors.text}]}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={[styles.title, { color: theme.colors.text }]}>Create Session</Text>
-      </View>
+        <View style={[styles.header, { backgroundColor: theme.isDark ? 'rgba(30,58,95,0.95)' : 'rgba(137, 194, 241, 0.72)' }]}>
+          <View style={styles.headerTopRow}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={[styles.backButtonBox, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+            >
+              <Text style={[styles.backArrow, { color: '#fff' }]}>{'<'}</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headerTextBlock}>
+            <Text style={[styles.title, { color: '#fff' }]}>Create New Session</Text>
+            <Text style={[styles.subtitle, { color: 'rgba(255,255,255,0.8)' }]}>
+              Set up a new game for others to join
+            </Text>
+            <View style={[styles.headerAccent, { backgroundColor: '#4CAF50' }]} />
+          </View>
+        </View>
 
       <View style={styles.form}>
-        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Title *</Text>
-        <TextInput
-          style={[styles.input, {
-            color: '#000',
-            borderColor: theme.isDark ? '#444' : '#ddd',
-            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
-          }]}
-          placeholder="e.g., Friday Evening Football"
-          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
-          value={title}
-          onChangeText={setTitle}
-          editable={!loading}
-        />
+        {/* Session Details Card */}
+        <View style={[styles.sectionCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.92)' }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>Session Details</Text>
 
-        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Description</Text>
-        <TextInput
-          style={[styles.input, styles.textArea, {
-            color: '#000',
-            borderColor: theme.isDark ? '#444' : '#ddd',
-            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
-          }]}
-          placeholder="Add details..."
-          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          maxLength={100}
-          editable={!loading}
-        />
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Title *</Text>
+          <TextInput
+            style={[styles.input, {
+              color: theme.isDark ? '#fff' : '#1a1a1a',
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            placeholder="e.g., Friday Evening Football"
+            placeholderTextColor={theme.isDark ? '#777' : '#999'}
+            value={title}
+            onChangeText={setTitle}
+            editable={!loading}
+          />
 
-        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Location *</Text>
-        <TouchableOpacity
-          style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}
-          onPress={() => setShowLocationModal(true)}
-          disabled={loading}
-        >
-          <Text style={[styles.dropdownText, { color: selectedLocation ? theme.colors.text : '#999' }]}>
-            {selectedLocation || 'Select Location'}
-          </Text>
-          <Text style={[styles.dropdownArrow, { color: theme.colors.text }]}>▼</Text>
-        </TouchableOpacity>
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Description</Text>
+          <TextInput
+            style={[styles.input, styles.textArea, {
+              color: theme.isDark ? '#fff' : '#1a1a1a',
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            placeholder="Add details..."
+            placeholderTextColor={theme.isDark ? '#777' : '#999'}
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            maxLength={100}
+            editable={!loading}
+          />
+        </View>
 
-        {selectedLocation && (
-          <>
-            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Sport *</Text>
-            <TouchableOpacity
-              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? '#2d2d2d' : 'white' }]}
-              onPress={() => setShowSportModal(true)}
-              disabled={loading}
-            >
-              <Text style={[styles.dropdownText, { color: selectedSport ? theme.colors.text : '#999' }]}>
-                {selectedSport || 'Select Sport'}
-              </Text>
-              <Text style={[styles.dropdownArrow, { color: theme.colors.text }]}>▼</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        {/* Venue & Sport Card */}
+        <View style={[styles.sectionCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.92)' }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>Venue & Sport</Text>
 
-        <View style={styles.row}>
-          <View style={styles.halfInput}>
-            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Date *</Text>
-            <TouchableOpacity
-              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
-              onPress={() => setShowDatePicker(true)}
-              disabled={loading}
-            >
-              <Text style={[styles.dropdownText, { color: dateString ? '#000' : '#999' }]}>
-                {dateString || 'Select Date'}
-              </Text>
-              <Text style={[styles.dropdownArrow, { color: '#000' }]}>📅</Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={date}
-                mode="date"
-                minimumDate={new Date()}
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleDateChange}
-              />
-            )}
-            {Platform.OS === 'ios' && showDatePicker && (
-              <View style={styles.datePickerButtons}>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={styles.datePickerButton}>Done</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Location *</Text>
+          <TouchableOpacity
+            style={[styles.dropdown, {
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            onPress={() => setShowLocationModal(true)}
+            disabled={loading}
+          >
+            <Text style={[styles.dropdownText, { color: selectedLocation ? (theme.isDark ? '#fff' : '#1a1a1a') : '#999' }]}>
+              {selectedLocation || 'Select Location'}
+            </Text>
+            <Text style={[styles.dropdownArrow, { color: theme.isDark ? '#aaa' : '#666' }]}>▼</Text>
+          </TouchableOpacity>
+
+          {selectedLocation && (
+            <>
+              <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Sport *</Text>
+              <TouchableOpacity
+                style={[styles.dropdown, {
+                  borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+                  backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+                }]}
+                onPress={() => setShowSportModal(true)}
+                disabled={loading}
+              >
+                <Text style={[styles.dropdownText, { color: selectedSport ? (theme.isDark ? '#fff' : '#1a1a1a') : '#999' }]}>
+                  {selectedSport || 'Select Sport'}
+                </Text>
+                <Text style={[styles.dropdownArrow, { color: theme.isDark ? '#aaa' : '#666' }]}>▼</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+
+        {/* Date & Time Card */}
+        <View style={[styles.sectionCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.92)' }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>Date & Time</Text>
+
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Date *</Text>
+          <TouchableOpacity
+            style={[styles.dropdown, {
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            onPress={() => setShowDatePicker(true)}
+            disabled={loading}
+          >
+            <Text style={[styles.dropdownText, { color: dateString ? (theme.isDark ? '#fff' : '#1a1a1a') : '#999' }]}>
+              {dateString || 'Select Date'}
+            </Text>
+            <Text style={[styles.dropdownArrow, { color: theme.isDark ? '#aaa' : '#666' }]}>📅</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              minimumDate={new Date()}
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleDateChange}
+            />
+          )}
+          {Platform.OS === 'ios' && showDatePicker && (
+            <View style={styles.datePickerButtons}>
+              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <Text style={styles.datePickerButton}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={styles.row}>
+            <View style={styles.halfInput}>
+              <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Start Time *</Text>
+              <TouchableOpacity
+                style={[styles.dropdown, {
+                  borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+                  backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+                }]}
+                onPress={() => setShowStartTimeModal(true)}
+                disabled={loading}
+              >
+                <Text style={[styles.dropdownText, { color: startTime ? (theme.isDark ? '#fff' : '#1a1a1a') : '#999' }]}>
+                  {startTime || 'Select'}
+                </Text>
+                <Text style={[styles.dropdownArrow, { color: theme.isDark ? '#aaa' : '#666' }]}>🕐</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.halfInput}>
+              <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>End Time *</Text>
+              <TouchableOpacity
+                style={[styles.dropdown, {
+                  borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+                  backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+                }]}
+                onPress={() => setShowEndTimeModal(true)}
+                disabled={loading}
+              >
+                <Text style={[styles.dropdownText, { color: endTime ? (theme.isDark ? '#fff' : '#1a1a1a') : '#999' }]}>
+                  {endTime || 'Select'}
+                </Text>
+                <Text style={[styles.dropdownArrow, { color: theme.isDark ? '#aaa' : '#666' }]}>🕐</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        <View style={styles.row}>
-          <View style={styles.halfInput}>
-            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Start Time *</Text>
-            <TouchableOpacity
-              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
-              onPress={() => setShowStartTimeModal(true)}
-              disabled={loading}
-            >
-              <Text style={[styles.dropdownText, { color: startTime ? '#000' : '#999' }]}>
-                {startTime || 'Select Time'}
-              </Text>
-              <Text style={[styles.dropdownArrow, { color: '#000' }]}>🕐</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.halfInput}>
-            <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>End Time *</Text>
-            <TouchableOpacity
-              style={[styles.dropdown, { borderColor: theme.isDark ? '#444' : '#ddd', backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)' }]}
-              onPress={() => setShowEndTimeModal(true)}
-              disabled={loading}
-            >
-              <Text style={[styles.dropdownText, { color: endTime ? '#000' : '#999' }]}>
-                {endTime || 'Select Time'}
-              </Text>
-              <Text style={[styles.dropdownArrow, { color: '#000' }]}>🕐</Text>
-            </TouchableOpacity>
-          </View>
+        {/* Session Settings Card */}
+        <View style={[styles.sectionCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.92)' }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>Session Settings</Text>
+
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Total Cost (₹) *</Text>
+          <TextInput
+            style={[styles.input, {
+              color: theme.isDark ? '#fff' : '#1a1a1a',
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            placeholder="e.g., 500"
+            placeholderTextColor={theme.isDark ? '#777' : '#999'}
+            value={cost}
+            onChangeText={setCost}
+            keyboardType="decimal-pad"
+            editable={!loading}
+          />
+          <Text style={[styles.hint, { color: theme.isDark ? '#aaa' : '#888' }]}>This will be split equally among all participants</Text>
+
+          <Text style={[styles.label, { color: theme.isDark ? '#ccc' : '#555' }]}>Max Participants *</Text>
+          <TextInput
+            style={[styles.input, {
+              color: theme.isDark ? '#fff' : '#1a1a1a',
+              borderColor: theme.isDark ? 'rgba(255,255,255,0.15)' : '#e0e4e8',
+              backgroundColor: theme.isDark ? 'rgba(255,255,255,0.06)' : '#f5f7fa'
+            }]}
+            placeholder="e.g., 14 (min: 2, max: 50)"
+            placeholderTextColor={theme.isDark ? '#777' : '#999'}
+            value={maxParticipants}
+            onChangeText={setMaxParticipants}
+            keyboardType="number-pad"
+            editable={!loading}
+          />
+          <Text style={[styles.hint, { color: theme.isDark ? '#aaa' : '#888' }]}>Maximum number of people who can join this session</Text>
         </View>
-
-        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Total Cost (₹) *</Text>
-        <TextInput
-          style={[styles.input, {
-            color: '#000',
-            borderColor: theme.isDark ? '#444' : '#ddd',
-            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
-          }]}
-          placeholder="e.g., 500"
-          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
-          value={cost}
-          onChangeText={setCost}
-          keyboardType="decimal-pad"
-          editable={!loading}
-        />
-        <Text style={[styles.hint, { color: theme.isDark ? '#ddd' : '#fff' }]}>This will be split equally among all participants</Text>
-
-        <Text style={[styles.label, { color: theme.isDark ? '#fff' : '#fff' }]}>Max Participants *</Text>
-        <TextInput
-          style={[styles.input, {
-            color: '#000',
-            borderColor: theme.isDark ? '#444' : '#ddd',
-            backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.85)'
-          }]}
-          placeholder="e.g., 14 (min: 2, max: 50)"
-          placeholderTextColor={theme.isDark ? '#ccc' : '#666'}
-          value={maxParticipants}
-          onChangeText={setMaxParticipants}
-          keyboardType="number-pad"
-          editable={!loading}
-        />
-        <Text style={[styles.hint, { color: theme.isDark ? '#ddd' : '#fff' }]}>Maximum number of people who can join this session</Text>
 
         <View style={styles.actions}>
           <TouchableOpacity
