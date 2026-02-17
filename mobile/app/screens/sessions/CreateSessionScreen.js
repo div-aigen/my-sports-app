@@ -58,6 +58,18 @@ const CreateSessionScreen = ({ navigation }) => {
     }
   };
 
+  // Check if a time slot is in the past (IST) for the selected date
+  const isTimePast = (time) => {
+    if (!dateString) return false;
+    const nowUTC = new Date();
+    const istOffsetMs = 5.5 * 60 * 60 * 1000;
+    const nowIST = new Date(nowUTC.getTime() + nowUTC.getTimezoneOffset() * 60000 + istOffsetMs);
+    const todayIST = `${nowIST.getFullYear()}-${String(nowIST.getMonth() + 1).padStart(2, '0')}-${String(nowIST.getDate()).padStart(2, '0')}`;
+    if (dateString !== todayIST) return false;
+    const [h, m] = time.split(':').map(Number);
+    return (h * 60 + m) <= (nowIST.getHours() * 60 + nowIST.getMinutes());
+  };
+
   // Get available sports for selected venue
   const availableSports = selectedVenueId
     ? venues.find(v => v.id === selectedVenueId)?.available_sports || []
@@ -66,6 +78,7 @@ const CreateSessionScreen = ({ navigation }) => {
   const handleDateChange = (event, selectedDate) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
+      if (event.type === 'dismissed') return;
     }
     if (selectedDate) {
       setDate(selectedDate);
@@ -81,6 +94,23 @@ const CreateSessionScreen = ({ navigation }) => {
   const handleCreate = async () => {
     if (!title || !selectedVenueId || !selectedSport || !dateString || !startTime || !endTime || !cost || !maxParticipants) {
       Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    // Validate that the session is not in the past (using IST = UTC+5:30)
+    const nowUTC = new Date();
+    const istOffsetMs = 5.5 * 60 * 60 * 1000;
+    const nowIST = new Date(nowUTC.getTime() + nowUTC.getTimezoneOffset() * 60000 + istOffsetMs);
+    const [sHour, sMin] = startTime.split(':').map(Number);
+    const todayIST = `${nowIST.getFullYear()}-${String(nowIST.getMonth() + 1).padStart(2, '0')}-${String(nowIST.getDate()).padStart(2, '0')}`;
+
+    if (dateString < todayIST) {
+      Alert.alert('Error', 'Cannot create a session for a past date.');
+      return;
+    }
+
+    if (dateString === todayIST && (sHour * 60 + sMin) <= (nowIST.getHours() * 60 + nowIST.getMinutes())) {
+      Alert.alert('Error', 'Cannot create a session for a past time. Please select a future start time.');
       return;
     }
 
@@ -263,6 +293,7 @@ const CreateSessionScreen = ({ navigation }) => {
               <DateTimePicker
                 value={date}
                 mode="date"
+                minimumDate={new Date()}
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                 onChange={handleDateChange}
               />
@@ -441,21 +472,28 @@ const CreateSessionScreen = ({ navigation }) => {
           <FlatList
             data={timeOptions}
             keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.modalOption,
-                  startTime === item && styles.modalOptionSelected,
-                  { borderColor: theme.isDark ? '#444' : '#eee' }
-                ]}
-                onPress={() => {
-                  setStartTime(item);
-                  setShowStartTimeModal(false);
-                }}
-              >
-                <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={({ item }) => {
+              const past = isTimePast(item);
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.modalOption,
+                    startTime === item && styles.modalOptionSelected,
+                    past && { opacity: 0.3 },
+                    { borderColor: theme.isDark ? '#444' : '#eee' }
+                  ]}
+                  onPress={() => {
+                    if (!past) {
+                      setStartTime(item);
+                      setShowStartTimeModal(false);
+                    }
+                  }}
+                  disabled={past}
+                >
+                  <Text style={[styles.modalOptionText, { color: theme.colors.text }]}>{item}</Text>
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       </View>
