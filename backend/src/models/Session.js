@@ -139,7 +139,7 @@ class Session {
     return result.rows[0];
   }
 
-  static async findAll(page = 1, limit = 10, status = 'open', date = null, location = null) {
+  static async findAll(page = 1, limit = 10, status = 'open', date = null, location = null, sportType = null) {
     let query = `
       SELECT s.*, u.full_name as creator_name,
              (SELECT COUNT(*) FROM participants WHERE session_id = s.id AND status = 'active') as participant_count
@@ -162,6 +162,11 @@ class Session {
     if (location) {
       params.push(`%${location}%`);
       query += ` AND s.location_address ILIKE $${params.length}`;
+    }
+
+    if (sportType) {
+      params.push(sportType);
+      query += ` AND s.sport_type = $${params.length}`;
     }
 
     query += ` ORDER BY s.scheduled_date DESC, s.scheduled_time DESC`;
