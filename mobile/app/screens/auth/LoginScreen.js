@@ -54,7 +54,9 @@ const LoginScreen = ({ showSignup = false }) => {
     setLoading(true);
     try {
       await signup(email, password, fullName, phoneNumber);
-      // Auth state will change and home screen will auto-update
+      Alert.alert('Success', 'Account created successfully. Please login.');
+      setIsSignup(false);
+      setPassword('');
     } catch (err) {
       const errorMessage = err.response?.data?.error || err.message || 'Something went wrong';
       console.log('Signup error:', err);
