@@ -167,6 +167,7 @@ const SessionDetailsModal = ({
 
   const renderActionButton = () => {
     if (!session) return null;
+    if (session.status === 'completed') return null;
 
     // ── MySessionsScreen mode ──────────────────────────────────────────────
     if (activeTab !== null && activeTab !== undefined) {
@@ -390,10 +391,12 @@ const SessionDetailsModal = ({
             {renderActionButton()}
 
             {/* Invite / share button */}
-            <TouchableOpacity style={styles.inviteButton} onPress={handleShareSession}>
-              <Text style={styles.inviteButtonIcon}>🔗</Text>
-              <Text style={styles.inviteButtonText}>Invite Friends</Text>
-            </TouchableOpacity>
+            {session?.status !== 'completed' && (
+              <TouchableOpacity style={styles.inviteButton} onPress={handleShareSession}>
+                <Text style={styles.inviteButtonIcon}>🔗</Text>
+                <Text style={styles.inviteButtonText}>Invite Friends</Text>
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </View>
       </View>

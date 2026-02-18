@@ -330,6 +330,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffcccc',
     color: '#c62828',
   },
+  completedStatus: {
+    backgroundColor: '#e0e0e0',
+    color: '#555',
+  },
   location: {
     fontSize: 13,
     color: '#666',

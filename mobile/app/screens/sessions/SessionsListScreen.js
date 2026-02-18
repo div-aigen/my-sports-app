@@ -64,6 +64,14 @@ const SessionsListScreen = ({ navigation = null }) => {
       .catch(() => {});
   }, []);
 
+  // Auto-refresh every 5 minutes to pick up completed sessions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchSessions();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [status, filterDate, locationFilter, sportFilter]);
+
   const fetchSessions = async () => {
     try {
       setLoading(true);
@@ -192,8 +200,8 @@ const SessionsListScreen = ({ navigation = null }) => {
     >
       <View style={styles.sessionHeader}>
         <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
-        <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : styles.openStatus]}>
-          {item.status.toUpperCase()}
+        <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
+          {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
         </Text>
       </View>
 
@@ -217,86 +225,88 @@ const SessionsListScreen = ({ navigation = null }) => {
         </View>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.joinButton,
-            (userParticipation[item.id] || item.status === 'full') && styles.buttonDisabled
-          ]}
-          onPress={async () => {
-            try {
-              await sessionAPI.join(item.id);
-              Alert.alert('Success', `Joined ${item.title}!`);
-              fetchSessions();
-            } catch (err) {
-              Alert.alert('Error', err.response?.data?.error || 'Failed to join session');
-            }
-          }}
-          disabled={userParticipation[item.id] || item.status === 'full'}
-        >
-          <Text style={styles.actionButtonText}>
-            {item.status === 'full' ? 'Full' : userParticipation[item.id] ? 'Joined' : 'Join'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.leaveButton,
-            !userParticipation[item.id] && styles.buttonDisabled
-          ]}
-          onPress={() => Alert.alert(
-            'Leave Session',
-            `Are you sure you want to leave "${item.title}"?`,
-            [
-              { text: 'Cancel', style: 'cancel' },
-              {
-                text: 'Leave',
-                style: 'destructive',
-                onPress: async () => {
-                  try {
-                    await sessionAPI.leave(item.id);
-                    Alert.alert('Success', `Left ${item.title}`);
-                    fetchSessions();
-                  } catch (err) {
-                    Alert.alert('Error', err.response?.data?.error || 'Failed to leave session');
-                  }
-                },
-              },
-            ]
-          )}
-          disabled={!userParticipation[item.id]}
-        >
-          <Text style={styles.actionButtonText}>Leave</Text>
-        </TouchableOpacity>
-        {item.creator_id === user.id && (
+      {item.status !== 'completed' && (
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.cancelButton]}
+            style={[
+              styles.actionButton,
+              styles.joinButton,
+              (userParticipation[item.id] || item.status === 'full') && styles.buttonDisabled
+            ]}
+            onPress={async () => {
+              try {
+                await sessionAPI.join(item.id);
+                Alert.alert('Success', `Joined ${item.title}!`);
+                fetchSessions();
+              } catch (err) {
+                Alert.alert('Error', err.response?.data?.error || 'Failed to join session');
+              }
+            }}
+            disabled={userParticipation[item.id] || item.status === 'full'}
+          >
+            <Text style={styles.actionButtonText}>
+              {item.status === 'full' ? 'Full' : userParticipation[item.id] ? 'Joined' : 'Join'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              styles.leaveButton,
+              !userParticipation[item.id] && styles.buttonDisabled
+            ]}
             onPress={() => Alert.alert(
-              'Cancel Session',
-              `Are you sure you want to cancel "${item.title}"? This will remove the session for all participants.`,
+              'Leave Session',
+              `Are you sure you want to leave "${item.title}"?`,
               [
-                { text: 'No', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel' },
                 {
-                  text: 'Yes, Cancel',
+                  text: 'Leave',
                   style: 'destructive',
                   onPress: async () => {
                     try {
-                      await sessionAPI.cancel(item.id);
-                      Alert.alert('Success', `Cancelled ${item.title}`);
+                      await sessionAPI.leave(item.id);
+                      Alert.alert('Success', `Left ${item.title}`);
                       fetchSessions();
                     } catch (err) {
-                      Alert.alert('Error', err.response?.data?.error || 'Failed to cancel session');
+                      Alert.alert('Error', err.response?.data?.error || 'Failed to leave session');
                     }
                   },
                 },
               ]
             )}
+            disabled={!userParticipation[item.id]}
           >
-            <Text style={styles.actionButtonText}>Cancel</Text>
+            <Text style={styles.actionButtonText}>Leave</Text>
           </TouchableOpacity>
-        )}
-      </View>
+          {item.creator_id === user.id && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.cancelButton]}
+              onPress={() => Alert.alert(
+                'Cancel Session',
+                `Are you sure you want to cancel "${item.title}"? This will remove the session for all participants.`,
+                [
+                  { text: 'No', style: 'cancel' },
+                  {
+                    text: 'Yes, Cancel',
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        await sessionAPI.cancel(item.id);
+                        Alert.alert('Success', `Cancelled ${item.title}`);
+                        fetchSessions();
+                      } catch (err) {
+                        Alert.alert('Error', err.response?.data?.error || 'Failed to cancel session');
+                      }
+                    },
+                  },
+                ]
+              )}
+            >
+              <Text style={styles.actionButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -344,12 +354,6 @@ const SessionsListScreen = ({ navigation = null }) => {
           onPress={() => setStatus('full')}
         >
           <Text style={status === 'full' ? styles.filterTextActive : styles.filterText}>Full</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, status === 'completed' && styles.filterButtonActive]}
-          onPress={() => setStatus('completed')}
-        >
-          <Text style={status === 'completed' ? styles.filterTextActive : styles.filterText}>Done</Text>
         </TouchableOpacity>
       </View>
 
