@@ -265,6 +265,25 @@ class Session {
     return result.rows[0];
   }
 
+  static async completeExpiredSessions() {
+    const result = await pool.query(`
+      UPDATE sessions
+      SET status = 'completed', updated_at = CURRENT_TIMESTAMP
+      WHERE status IN ('open', 'full')
+        AND (
+          CASE
+            WHEN scheduled_end_time IS NOT NULL AND scheduled_end_time < scheduled_time
+              THEN (scheduled_date + INTERVAL '1 day' + scheduled_end_time)
+            WHEN scheduled_end_time IS NOT NULL
+              THEN (scheduled_date + scheduled_end_time)
+            ELSE (scheduled_date + scheduled_time + INTERVAL '1 hour')
+          END
+        ) < (NOW() AT TIME ZONE 'Asia/Kolkata')
+      RETURNING id
+    `);
+    return result.rows.length;
+  }
+
   static async updateStatus(id, status) {
     const result = await pool.query(
       `UPDATE sessions

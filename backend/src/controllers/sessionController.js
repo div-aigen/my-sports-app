@@ -49,6 +49,9 @@ const createSession = async (req, res) => {
 
 const listSessions = async (req, res) => {
   try {
+    // Auto-complete sessions whose end time has passed (IST)
+    await Session.completeExpiredSessions();
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const status = req.query.status || 'open';
