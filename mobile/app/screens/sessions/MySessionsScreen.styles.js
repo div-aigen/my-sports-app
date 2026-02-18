@@ -88,6 +88,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
+  sessionCardFull: {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
   buttonContainer: {
     flexDirection: 'row',
     gap: 8,
@@ -148,6 +152,10 @@ const styles = StyleSheet.create({
   fullStatus: {
     backgroundColor: '#ffcccc',
     color: '#c62828',
+  },
+  completedStatus: {
+    backgroundColor: '#e0e0e0',
+    color: '#555',
   },
   location: {
     fontSize: 13,

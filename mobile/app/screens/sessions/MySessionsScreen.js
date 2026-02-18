@@ -23,12 +23,13 @@ const MySessionsScreen = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState('joined'); // 'joined' or 'created'
+  const [activeTab, setActiveTab] = useState('joined'); // 'joined', 'created', or 'done'
   const [selectedSession, setSelectedSession] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [joinedCount, setJoinedCount] = useState(0);
   const [createdCount, setCreatedCount] = useState(0);
+  const [doneCount, setDoneCount] = useState(0);
   const [venues, setVenues] = useState([]);
 
   useEffect(() => {
@@ -41,13 +42,22 @@ const MySessionsScreen = () => {
       .catch(() => {});
   }, []);
 
+  // Auto-refresh every 5 minutes to pick up completed sessions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchSessions();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      // Fetch both open and full sessions to see all sessions
+      // Fetch open, full, and completed sessions
       const openResponse = await sessionAPI.list(1, 50, 'open');
       const fullResponse = await sessionAPI.list(1, 50, 'full');
-      const allSessions = [...openResponse.data.sessions, ...fullResponse.data.sessions];
+      const completedResponse = await sessionAPI.list(1, 50, 'completed');
+      const allSessions = [...openResponse.data.sessions, ...fullResponse.data.sessions, ...completedResponse.data.sessions];
 
       // Get participation status for all sessions
       const participationStatus = {};
@@ -64,19 +74,24 @@ const MySessionsScreen = () => {
         })
       );
 
-      // Calculate both counts
-      const joined = allSessions.filter((s) => participationStatus[s.id]);
-      const created = allSessions.filter((s) => s.creator_id === user.id);
+      // Separate completed sessions that user participated in
+      const done = allSessions.filter((s) => s.status === 'completed' && participationStatus[s.id]);
+      const activeSessions = allSessions.filter((s) => s.status !== 'completed');
+      const joined = activeSessions.filter((s) => participationStatus[s.id]);
+      const created = activeSessions.filter((s) => s.creator_id === user.id);
 
       // Update counts
       setJoinedCount(joined.length);
       setCreatedCount(created.length);
+      setDoneCount(done.length);
 
       // Display filtered sessions based on active tab
       if (activeTab === 'joined') {
         setSessions(joined);
-      } else {
+      } else if (activeTab === 'created') {
         setSessions(created);
+      } else {
+        setSessions(done);
       }
     } catch (err) {
       Alert.alert('Error', 'Failed to fetch sessions');
@@ -113,14 +128,14 @@ const MySessionsScreen = () => {
   const renderSession = ({ item }) => (
     <View style={styles.sessionCardContainer}>
       <TouchableOpacity
-        style={[styles.sessionCard, { backgroundColor: theme.colors.surface }]}
+        style={[styles.sessionCard, { backgroundColor: theme.colors.surface }, item.status === 'completed' && styles.sessionCardFull]}
         onPress={() => handleShowSessionDetails(item)}
         activeOpacity={0.7}
       >
         <View style={styles.sessionHeader}>
           <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
-          <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : styles.openStatus]}>
-            {item.status.toUpperCase()}
+          <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
+            {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
           </Text>
         </View>
 
@@ -148,60 +163,62 @@ const MySessionsScreen = () => {
         </View>
       </TouchableOpacity>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.leaveButton]}
-          onPress={() => Alert.alert(
-            'Leave Session',
-            `Are you sure you want to leave "${item.title}"?`,
-            [
-              { text: 'Cancel', style: 'cancel' },
-              {
-                text: 'Leave',
-                style: 'destructive',
-                onPress: async () => {
-                  try {
-                    await sessionAPI.leave(item.id);
-                    Alert.alert('Success', `Left ${item.title}`);
-                    fetchSessions();
-                  } catch (err) {
-                    Alert.alert('Error', err.response?.data?.error || 'Failed to leave session');
-                  }
-                },
-              },
-            ]
-          )}
-        >
-          <Text style={styles.actionButtonText}>Leave</Text>
-        </TouchableOpacity>
-        {activeTab === 'created' && (
+      {item.status !== 'completed' && (
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.cancelButton]}
+            style={[styles.actionButton, styles.leaveButton]}
             onPress={() => Alert.alert(
-              'Cancel Session',
-              `Are you sure you want to cancel "${item.title}"? This will remove the session for all participants.`,
+              'Leave Session',
+              `Are you sure you want to leave "${item.title}"?`,
               [
-                { text: 'No', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel' },
                 {
-                  text: 'Yes, Cancel',
+                  text: 'Leave',
                   style: 'destructive',
                   onPress: async () => {
                     try {
-                      await sessionAPI.cancel(item.id);
-                      Alert.alert('Success', `Cancelled ${item.title}`);
+                      await sessionAPI.leave(item.id);
+                      Alert.alert('Success', `Left ${item.title}`);
                       fetchSessions();
                     } catch (err) {
-                      Alert.alert('Error', err.response?.data?.error || 'Failed to cancel session');
+                      Alert.alert('Error', err.response?.data?.error || 'Failed to leave session');
                     }
                   },
                 },
               ]
             )}
           >
-            <Text style={styles.actionButtonText}>Cancel</Text>
+            <Text style={styles.actionButtonText}>Leave</Text>
           </TouchableOpacity>
-        )}
-      </View>
+          {activeTab === 'created' && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.cancelButton]}
+              onPress={() => Alert.alert(
+                'Cancel Session',
+                `Are you sure you want to cancel "${item.title}"? This will remove the session for all participants.`,
+                [
+                  { text: 'No', style: 'cancel' },
+                  {
+                    text: 'Yes, Cancel',
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        await sessionAPI.cancel(item.id);
+                        Alert.alert('Success', `Cancelled ${item.title}`);
+                        fetchSessions();
+                      } catch (err) {
+                        Alert.alert('Error', err.response?.data?.error || 'Failed to cancel session');
+                      }
+                    },
+                  },
+                ]
+              )}
+            >
+              <Text style={styles.actionButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </View>
   );
 
@@ -241,6 +258,14 @@ const MySessionsScreen = () => {
             Created ({createdCount})
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'done' && styles.tabActive]}
+          onPress={() => setActiveTab('done')}
+        >
+          <Text style={[styles.tabText, activeTab === 'done' && styles.tabTextActive]}>
+            Done ({doneCount})
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -250,12 +275,14 @@ const MySessionsScreen = () => {
       ) : sessions.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
-            No {activeTab} sessions yet
+            No {activeTab === 'done' ? 'completed' : activeTab} sessions yet
           </Text>
           <Text style={styles.emptySubtext}>
             {activeTab === 'joined'
               ? 'Join sessions to see them here'
-              : 'Create a session to get started'}
+              : activeTab === 'created'
+              ? 'Create a session to get started'
+              : 'Completed sessions will appear here'}
           </Text>
         </View>
       ) : (
