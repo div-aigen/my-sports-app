@@ -307,11 +307,12 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   cardBackgroundImage: {
-    opacity: 0.3,
+    opacity: 0.6,
     borderRadius: 12,
   },
   cardBackgroundOverlay: {
     padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   sessionHeader: {
     flexDirection: 'row',
@@ -321,9 +322,12 @@ const styles = StyleSheet.create({
   },
   sessionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '800',
+    color: '#fff',
     flex: 1,
+    textShadowColor: 'rgba(0,0,0,0.6)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   status: {
     paddingHorizontal: 8,
@@ -346,7 +350,7 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 13,
-    color: '#666',
+    color: 'rgba(255,255,255,0.85)',
     marginBottom: 12,
   },
   sessionDetails: {
@@ -354,17 +358,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'rgba(255,255,255,0.3)',
   },
   detailLabel: {
     fontSize: 11,
-    color: '#999',
+    color: 'rgba(255,255,255,0.7)',
     marginBottom: 4,
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#fff',
   },
   buttonContainer: {
     flexDirection: 'row',

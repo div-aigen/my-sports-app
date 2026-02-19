@@ -143,7 +143,7 @@ const MySessionsScreen = () => {
   const renderSessionContent = (item) => (
     <>
       <View style={styles.sessionHeader}>
-        <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
+        <Text style={styles.sessionTitle}>{item.title}</Text>
         <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
           {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
         </Text>

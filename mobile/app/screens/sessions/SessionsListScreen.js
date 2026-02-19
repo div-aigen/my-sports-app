@@ -210,15 +210,15 @@ const SessionsListScreen = ({ navigation = null }) => {
   const renderSessionContent = (item) => (
     <>
       <View style={styles.sessionHeader}>
-        <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
+        <Text style={styles.sessionTitle}>{item.title}</Text>
         <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
           {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
         </Text>
       </View>
 
-      <Text style={[styles.location, { color: theme.colors.textSecondary }]}>{item.location_address}</Text>
+      <Text style={styles.location}>{item.location_address}</Text>
 
-      <View style={[styles.sessionDetails, { borderTopColor: theme.colors.border }]}>
+      <View style={styles.sessionDetails}>
         <View>
           <Text style={styles.detailLabel}>Date & Time</Text>
           <Text style={styles.detailValue}>{formatDateTime(item.scheduled_date)}</Text>
