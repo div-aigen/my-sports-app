@@ -356,7 +356,7 @@ const SessionsListScreen = ({ navigation = null }) => {
       )}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)' }]}>
         <View>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Sports Sessions</Text>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Lineup Sessions</Text>
           <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}!</Text>
         </View>
         <View style={styles.headerButtons}>
