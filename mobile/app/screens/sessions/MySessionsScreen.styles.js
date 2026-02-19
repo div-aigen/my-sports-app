@@ -92,6 +92,16 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
+  cardBackground: {
+    margin: 0,
+  },
+  cardBackgroundImage: {
+    opacity: 0.3,
+    borderRadius: 12,
+  },
+  cardBackgroundOverlay: {
+    padding: 16,
+  },
   buttonContainer: {
     flexDirection: 'row',
     gap: 8,

@@ -125,42 +125,74 @@ const MySessionsScreen = () => {
     setParticipants([]);
   };
 
-  const renderSession = ({ item }) => (
+  const venueBackgrounds = {
+    'Harmony Park': require('../../../assets/images/yolo_gaming_arena.png'),
+    'Aishbagh Sports Complex': require('../../../assets/images/aishbagh_sports_complex.jpg'),
+    'Central Stadium': require('../../../assets/images/central_stadium.png'),
+    'Jai Prakash Park': require('../../../assets/images/jai_pakash_park.png'),
+    'Ram Manohar Lohia Park': require('../../../assets/images/ram_manohar.png'),
+  };
+
+  const getVenueBackground = (locationAddress) => {
+    for (const [venueName, image] of Object.entries(venueBackgrounds)) {
+      if (locationAddress && locationAddress.includes(venueName)) return image;
+    }
+    return null;
+  };
+
+  const renderSessionContent = (item) => (
+    <>
+      <View style={styles.sessionHeader}>
+        <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
+        <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
+          {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
+        </Text>
+      </View>
+
+      <Text style={styles.location}>{item.location_address}</Text>
+
+      <View style={styles.sessionDetails}>
+        <View>
+          <Text style={styles.detailLabel}>📅 Date</Text>
+          <Text style={styles.detailValue}>{formatDateTime(item.scheduled_date)}</Text>
+        </View>
+        <View>
+          <Text style={styles.detailLabel}>🕐 Time</Text>
+          <Text style={styles.detailValue}>{item.scheduled_time ? formatTime(item.scheduled_time) : ''}</Text>
+        </View>
+        <View>
+          <Text style={styles.detailLabel}>💰 Cost</Text>
+          <Text style={styles.detailValue}>₹{item.total_cost}</Text>
+        </View>
+        <View>
+          <Text style={styles.detailLabel}>👥 Players</Text>
+          <Text style={styles.detailValue}>
+            {item.participant_count}/{item.max_participants}
+          </Text>
+        </View>
+      </View>
+    </>
+  );
+
+  const renderSession = ({ item }) => {
+    const bgImage = getVenueBackground(item.location_address);
+
+    return (
     <View style={styles.sessionCardContainer}>
       <TouchableOpacity
-        style={[styles.sessionCard, { backgroundColor: theme.colors.surface }, item.status === 'completed' && styles.sessionCardFull]}
+        style={[styles.sessionCard, { backgroundColor: theme.colors.surface, overflow: 'hidden' }, item.status === 'completed' && styles.sessionCardFull]}
         onPress={() => handleShowSessionDetails(item)}
         activeOpacity={0.7}
       >
-        <View style={styles.sessionHeader}>
-          <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
-          <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
-            {item.status === 'completed' ? 'DONE' : item.status.toUpperCase()}
-          </Text>
-        </View>
-
-        <Text style={styles.location}>{item.location_address}</Text>
-
-        <View style={styles.sessionDetails}>
-          <View>
-            <Text style={styles.detailLabel}>📅 Date</Text>
-            <Text style={styles.detailValue}>{formatDateTime(item.scheduled_date)}</Text>
-          </View>
-          <View>
-            <Text style={styles.detailLabel}>🕐 Time</Text>
-            <Text style={styles.detailValue}>{item.scheduled_time ? formatTime(item.scheduled_time) : ''}</Text>
-          </View>
-          <View>
-            <Text style={styles.detailLabel}>💰 Cost</Text>
-            <Text style={styles.detailValue}>₹{item.total_cost}</Text>
-          </View>
-          <View>
-            <Text style={styles.detailLabel}>👥 Players</Text>
-            <Text style={styles.detailValue}>
-              {item.participant_count}/{item.max_participants}
-            </Text>
-          </View>
-        </View>
+        {bgImage ? (
+          <ImageBackground source={bgImage} style={styles.cardBackground} imageStyle={styles.cardBackgroundImage}>
+            <View style={styles.cardBackgroundOverlay}>
+              {renderSessionContent(item)}
+            </View>
+          </ImageBackground>
+        ) : (
+          renderSessionContent(item)
+        )}
       </TouchableOpacity>
 
       {item.status !== 'completed' && (
@@ -220,7 +252,8 @@ const MySessionsScreen = () => {
         </View>
       )}
     </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
