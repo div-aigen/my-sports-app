@@ -274,10 +274,10 @@ const MySessionsScreen = () => {
         </View>
       ) : sessions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyText, {color: "#ffff"}]}>
             No {activeTab === 'done' ? 'completed' : activeTab} sessions yet
           </Text>
-          <Text style={styles.emptySubtext}>
+          <Text style={[styles.emptySubtext, {color: "#ffff"}]}>
             {activeTab === 'joined'
               ? 'Join sessions to see them here'
               : activeTab === 'created'

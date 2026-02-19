@@ -192,12 +192,23 @@ const SessionsListScreen = ({ navigation = null }) => {
     }
   };
 
-  const renderSession = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.sessionCard, { backgroundColor: theme.colors.surface }]}
-      onPress={() => handleShowSessionDetails(item)}
-      activeOpacity={0.7}
-    >
+  const venueBackgrounds = {
+    'Harmony Park': require('../../../assets/images/yolo_gaming_arena.png'),
+    'Aishbagh Sports Complex': require('../../../assets/images/aishbagh_sports_complex.jpg'),
+    'Central Stadium': require('../../../assets/images/central_stadium.png'),
+    'Jai Prakash Park': require('../../../assets/images/jai_pakash_park.png'),
+    'Ram Manohar Lohia Park': require('../../../assets/images/ram_manohar.png'),
+  };
+
+  const getVenueBackground = (locationAddress) => {
+    for (const [venueName, image] of Object.entries(venueBackgrounds)) {
+      if (locationAddress && locationAddress.includes(venueName)) return image;
+    }
+    return null;
+  };
+
+  const renderSessionContent = (item) => (
+    <>
       <View style={styles.sessionHeader}>
         <Text style={[styles.sessionTitle, { color: theme.colors.text }]}>{item.title}</Text>
         <Text style={[styles.status, item.status === 'full' ? styles.fullStatus : item.status === 'completed' ? styles.completedStatus : styles.openStatus]}>
@@ -224,6 +235,27 @@ const SessionsListScreen = ({ navigation = null }) => {
           </Text>
         </View>
       </View>
+    </>
+  );
+
+  const renderSession = ({ item }) => {
+    const bgImage = getVenueBackground(item.location_address);
+
+    return (
+    <TouchableOpacity
+      style={[styles.sessionCard, { backgroundColor: theme.colors.surface, overflow: 'hidden' }]}
+      onPress={() => handleShowSessionDetails(item)}
+      activeOpacity={0.7}
+    >
+      {bgImage ? (
+        <ImageBackground source={bgImage} style={styles.cardBackground} imageStyle={styles.cardBackgroundImage}>
+          <View style={styles.cardBackgroundOverlay}>
+            {renderSessionContent(item)}
+          </View>
+        </ImageBackground>
+      ) : (
+        renderSessionContent(item)
+      )}
 
       {item.status !== 'completed' && (
         <View style={styles.buttonContainer}>
@@ -308,7 +340,8 @@ const SessionsListScreen = ({ navigation = null }) => {
         </View>
       )}
     </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -383,7 +416,7 @@ const SessionsListScreen = ({ navigation = null }) => {
         </View>
       ) : sessions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No sessions available</Text>
+          <Text style={[styles.emptyText, {color: "#ffff"}]}>No sessions available</Text>
           <TouchableOpacity
             style={styles.emptyButton}
             onPress={handleCreateSession}

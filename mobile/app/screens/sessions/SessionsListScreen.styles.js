@@ -303,6 +303,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
+  cardBackground: {
+    margin: 0,
+  },
+  cardBackgroundImage: {
+    opacity: 0.3,
+    borderRadius: 12,
+  },
+  cardBackgroundOverlay: {
+    padding: 16,
+  },
   sessionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
