@@ -75,6 +75,9 @@ export const LoginPage = () => {
         </form>
 
         <p className="text-center text-gray-600 mt-4">
+          <Link to="/forgot-password" className="text-blue-500 hover:underline">Forgot Password?</Link>
+        </p>
+        <p className="text-center text-gray-600 mt-2">
           Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign Up</Link>
         </p>
       </div>

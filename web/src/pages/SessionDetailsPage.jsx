@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { sessionAPI } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 import { useWebSocket } from '../services/websocket';
+import { getVenueBackground } from '../utils/venueImages';
 
 export const SessionDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const { joinSessionRoom, leaveSessionRoom, on, off } = useWebSocket();
 
   const [session, setSession] = useState(null);
@@ -16,22 +17,18 @@ export const SessionDetailsPage = () => {
   const [error, setError] = useState('');
   const [isParticipant, setIsParticipant] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     fetchSession();
     joinSessionRoom(id);
 
-    // Listen for real-time updates
     on('participant-joined', (data) => {
-      if (data.sessionId === parseInt(id)) {
-        fetchSession();
-      }
+      if (data.sessionId === parseInt(id)) fetchSession();
     });
 
     on('participant-left', (data) => {
-      if (data.sessionId === parseInt(id)) {
-        fetchSession();
-      }
+      if (data.sessionId === parseInt(id)) fetchSession();
     });
 
     return () => {
@@ -74,7 +71,6 @@ export const SessionDetailsPage = () => {
 
   const handleLeave = async () => {
     if (!confirm('Are you sure you want to leave this session?')) return;
-
     setActionLoading(true);
     try {
       await sessionAPI.leave(id);
@@ -88,7 +84,6 @@ export const SessionDetailsPage = () => {
 
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel this session?')) return;
-
     setActionLoading(true);
     try {
       await sessionAPI.cancel(id);
@@ -100,47 +95,57 @@ export const SessionDetailsPage = () => {
     }
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShared(true);
+    setTimeout(() => setShared(false), 2000);
+  };
+
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center py-20">Loading...</div>;
   }
 
   if (!session) {
-    return <div className="flex items-center justify-center min-h-screen">Session not found</div>;
+    return <div className="flex items-center justify-center py-20">Session not found</div>;
   }
 
   const isCreator = user.id === session.creator_id;
   const isFull = session.participant_count >= session.max_participants;
   const costPerPerson = session.total_cost / session.participant_count;
+  const isActive = session.status !== 'completed' && session.status !== 'cancelled';
+  const bgImage = getVenueBackground(session.location_address);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-blue-600 text-white shadow-lg">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex-1">
-            <button
-              onClick={() => navigate('/sessions')}
-              className="text-blue-100 hover:text-white mb-2"
-            >
-              ← Back to Sessions
-            </button>
-            <h1 className="text-3xl font-bold">{session.title}</h1>
-          </div>
+    <div>
+      {/* Session Header with venue background */}
+      <div
+        className="relative py-8"
+        style={bgImage ? {
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        } : { backgroundColor: '#f3f4f6' }}
+      >
+        {bgImage && <div className="absolute inset-0 bg-black/50" />}
+        <div className="relative max-w-4xl mx-auto px-4">
           <button
-            onClick={logout}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg"
+            onClick={() => navigate('/sessions')}
+            className={`mb-2 text-sm ${bgImage ? 'text-gray-300 hover:text-white' : 'text-blue-600 hover:text-blue-800'}`}
           >
-            Logout
+            &larr; Back to Sessions
           </button>
+          <h1 className={`text-3xl font-bold ${bgImage ? 'text-white' : 'text-gray-800'}`}>
+            {session.title}
+          </h1>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {error && <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>}
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main Content */}
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
               <h2 className="text-2xl font-semibold mb-4">Session Details</h2>
 
@@ -195,7 +200,7 @@ export const SessionDetailsPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="col-span-1">
+          <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
               <div className="mb-6">
                 <p className="text-gray-600 text-sm">Total Cost</p>
@@ -210,36 +215,51 @@ export const SessionDetailsPage = () => {
               <div className="mb-6">
                 <p className="text-gray-600 text-sm">Status</p>
                 <p className={`text-lg font-semibold ${
-                  session.status === 'full' ? 'text-red-600' : 'text-green-600'
+                  session.status === 'open' ? 'text-green-600' :
+                  session.status === 'full' ? 'text-red-600' :
+                  'text-gray-600'
                 }`}>
                   {session.status.toUpperCase()}
                 </p>
               </div>
 
-              {isCreator ? (
-                <button
-                  onClick={handleCancel}
-                  disabled={actionLoading}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
-                >
-                  {actionLoading ? 'Cancelling...' : 'Cancel Session'}
-                </button>
-              ) : isParticipant ? (
-                <button
-                  onClick={handleLeave}
-                  disabled={actionLoading}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
-                >
-                  {actionLoading ? 'Leaving...' : 'Leave Session'}
-                </button>
-              ) : (
-                <button
-                  onClick={handleJoin}
-                  disabled={actionLoading || isFull}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
-                >
-                  {actionLoading ? 'Joining...' : isFull ? 'Session Full' : 'Join Session'}
-                </button>
+              {/* Share button */}
+              <button
+                onClick={handleShare}
+                className="w-full mb-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg transition-colors"
+              >
+                {shared ? 'Link Copied!' : 'Share Session'}
+              </button>
+
+              {/* Action buttons - only show for active sessions */}
+              {isActive && (
+                <>
+                  {isCreator ? (
+                    <button
+                      onClick={handleCancel}
+                      disabled={actionLoading}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
+                    >
+                      {actionLoading ? 'Cancelling...' : 'Cancel Session'}
+                    </button>
+                  ) : isParticipant ? (
+                    <button
+                      onClick={handleLeave}
+                      disabled={actionLoading}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
+                    >
+                      {actionLoading ? 'Leaving...' : 'Leave Session'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleJoin}
+                      disabled={actionLoading || isFull}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50"
+                    >
+                      {actionLoading ? 'Joining...' : isFull ? 'Session Full' : 'Join Session'}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
