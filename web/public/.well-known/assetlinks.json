@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.div.mysportsapp",
-    "sha256_cert_fingerprints": ["PLACEHOLDER_SHA256_FINGERPRINT"]
+    "sha256_cert_fingerprints": ["44:83:3E:75:1D:4D:E2:F5:43:43:E8:A8:38:9E:79:CB:04:58:46:75:2F:24:CF:14:FC:A5:57:B3:03:03:45:46"]
   }
 }]
