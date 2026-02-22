@@ -28,11 +28,14 @@ const SessionDetailScreen = ({ route, navigation }) => {
   const fetchDetails = async () => {
     try {
       setLoading(true);
-      const [sessionRes, participantsRes] = await Promise.all([
-        sessionAPI.get(sessionId),
-        sessionAPI.getParticipants(sessionId),
-      ]);
-      setSession(sessionRes.data.session);
+      // sessionId can be numeric or UUID (session_id) from deep links
+      // Fetch session first to get the numeric id for other API calls
+      const sessionRes = await sessionAPI.get(sessionId);
+      const sessionData = sessionRes.data.session;
+      setSession(sessionData);
+
+      // Use numeric id for participants (backend requires numeric id)
+      const participantsRes = await sessionAPI.getParticipants(sessionData.id);
       setParticipants(participantsRes.data.participants);
       setIsParticipant(participantsRes.data.participants.some(p => p.user_id === user.id));
     } catch (err) {
@@ -56,7 +59,7 @@ const SessionDetailScreen = ({ route, navigation }) => {
         return;
       }
 
-      await sessionAPI.join(sessionId);
+      await sessionAPI.join(session.id);
       await fetchDetails();
       Alert.alert('Success', 'You joined the session!');
     } catch (err) {
@@ -75,7 +78,7 @@ const SessionDetailScreen = ({ route, navigation }) => {
         onPress: async () => {
           setActionLoading(true);
           try {
-            await sessionAPI.leave(sessionId);
+            await sessionAPI.leave(session.id);
             await fetchDetails();
             Alert.alert('Success', 'You left the session');
           } catch (err) {
