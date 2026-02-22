@@ -117,7 +117,7 @@ export const SessionDetailsPage = () => {
   };
 
   const handleShare = () => {
-    const shareUrl = `https://web-ten-theta-34.vercel.app/sessions/${session.session_id}`;
+    const shareUrl = `https://lineup-sports.vercel.app/sessions/${session.session_id}`;
     navigator.clipboard.writeText(shareUrl);
     setShared(true);
     setTimeout(() => setShared(false), 2000);

@@ -7,14 +7,8 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
   'http://localhost:5174',
-  'http://localhost:8082',
-  'http://localhost:8084',
-  'http://localhost:8085',
-  'http://127.0.0.1:8085',
-  'https://web-ten-theta-34.vercel.app',
+  'https://lineup-sports.vercel.app',
 ];
 
 // Also allow any *.vercel.app subdomain for preview deploys
