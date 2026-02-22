@@ -29,15 +29,8 @@ export const sessionAPI = {
   list: (page = 1, limit = 10, status = 'open', date = null, location = null) =>
     api.get('/sessions', { params: { page, limit, status, date, location } }),
   get: (id) => api.get(`/sessions/${id}`),
-  create: (title, description, locationAddress, scheduledDate, scheduledTime, totalCost) =>
-    api.post('/sessions', {
-      title,
-      description,
-      location_address: locationAddress,
-      scheduled_date: scheduledDate,
-      scheduled_time: scheduledTime,
-      total_cost: totalCost,
-    }),
+  create: (data) =>
+    api.post('/sessions', data),
   update: (id, data) => api.put(`/sessions/${id}`, data),
   cancel: (id) => api.delete(`/sessions/${id}`),
   join: (id) => api.post(`/sessions/${id}/join`),

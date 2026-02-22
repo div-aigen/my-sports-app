@@ -82,159 +82,414 @@ export const ProfilePage = () => {
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Profile</h1>
+  const inputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    background: '#f9fafb',
+    border: '2px solid #e5e7eb',
+    borderRadius: '12px',
+    fontSize: '14px',
+    outline: 'none',
+    transition: 'all 0.2s',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+  };
 
-      {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">{success}</div>}
+  const labelStyle = {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#374151',
+    marginBottom: '8px',
+  };
+
+  const focusInput = (e) => { e.target.style.borderColor = '#3b82f6'; e.target.style.background = '#fff'; };
+  const blurInput = (e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = '#f9fafb'; };
+
+  return (
+    <div style={{ maxWidth: '520px', margin: '0 auto', padding: '32px 20px' }}>
+      <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', margin: '0 0 24px' }}>
+        Profile
+      </h1>
+
+      {success && (
+        <div style={{
+          background: '#f0fdf4',
+          borderLeft: '4px solid #22c55e',
+          color: '#166534',
+          padding: '12px 16px',
+          borderRadius: '10px',
+          marginBottom: '20px',
+          fontSize: '14px',
+          fontWeight: 500,
+        }}>
+          {success}
+        </div>
+      )}
 
       {/* Profile Card */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">{getInitials(user?.full_name)}</span>
+      <div style={{
+        background: 'white',
+        borderRadius: '20px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        overflow: 'hidden',
+        marginBottom: '20px',
+      }}>
+        <div style={{
+          height: '80px',
+          background: 'linear-gradient(90deg, #1e40af, #2563eb, #4f46e5)',
+        }} />
+        <div style={{ padding: '0 28px 28px', marginTop: '-40px' }}>
+          {/* Avatar */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '4px solid white',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            marginBottom: '16px',
+          }}>
+            <span style={{ color: 'white', fontSize: '28px', fontWeight: 700 }}>
+              {getInitials(user?.full_name)}
+            </span>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800">{user?.full_name || 'User'}</h2>
-            <p className="text-gray-600">{user?.email}</p>
-            <p className="text-gray-500 text-sm">{user?.phone_number}</p>
+
+          <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
+            {user?.full_name || 'User'}
+          </h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '14px' }}>
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {user?.email}
+            </div>
+            {user?.phone_number && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '14px' }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                {user.phone_number}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Account Settings */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
-        <h3 className="px-6 pt-4 pb-2 text-sm font-semibold text-gray-500 uppercase">Account Settings</h3>
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        overflow: 'hidden',
+        marginBottom: '20px',
+      }}>
+        <h3 style={{
+          padding: '18px 24px 12px',
+          fontSize: '12px',
+          fontWeight: 700,
+          color: '#9ca3af',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          margin: 0,
+        }}>
+          Account Settings
+        </h3>
 
         <button
           onClick={() => { setShowEditModal(true); setError(''); }}
-          className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 24px',
+            background: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+            fontFamily: 'inherit',
+            textAlign: 'left',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
         >
-          <div className="text-left">
-            <p className="font-medium text-gray-800">Edit Profile</p>
-            <p className="text-sm text-gray-500">Update your name and phone number</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px',
+              background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" fill="none" stroke="#2563eb" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: 0 }}>Edit Profile</p>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>Update your name and phone number</p>
+            </div>
           </div>
-          <span className="text-gray-400 text-xl">›</span>
+          <svg width="20" height="20" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
+
+        <div style={{ height: '1px', background: '#f3f4f6', margin: '0 24px' }} />
 
         <button
           onClick={() => { setShowPasswordModal(true); setError(''); }}
-          className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 border-t border-gray-100 transition-colors"
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 24px',
+            background: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+            fontFamily: 'inherit',
+            textAlign: 'left',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
         >
-          <div className="text-left">
-            <p className="font-medium text-gray-800">Change Password</p>
-            <p className="text-sm text-gray-500">Secure your account</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px',
+              background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" fill="none" stroke="#d97706" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: 0 }}>Change Password</p>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>Secure your account</p>
+            </div>
           </div>
-          <span className="text-gray-400 text-xl">›</span>
+          <svg width="20" height="20" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
 
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition-colors"
+        style={{
+          width: '100%',
+          padding: '14px',
+          background: 'white',
+          color: '#dc2626',
+          fontWeight: 700,
+          fontSize: '15px',
+          border: '2px solid #fecaca',
+          borderRadius: '14px',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          fontFamily: 'inherit',
+        }}
+        onMouseEnter={e => { e.target.style.background = '#fef2f2'; e.target.style.borderColor = '#f87171'; }}
+        onMouseLeave={e => { e.target.style.background = 'white'; e.target.style.borderColor = '#fecaca'; }}
       >
         Logout
       </button>
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold">Edit Profile</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">
-                &times;
-              </button>
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, padding: '20px',
+          backdropFilter: 'blur(4px)',
+        }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowEditModal(false); }}
+        >
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.2)',
+            width: '100%',
+            maxWidth: '440px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '4px',
+              background: 'linear-gradient(90deg, #3b82f6, #4f46e5)',
+            }} />
+            <div style={{ padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#111827', margin: 0 }}>Edit Profile</h3>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: '#f3f4f6', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '18px', color: '#6b7280', transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={e => { e.target.style.background = '#e5e7eb'; }}
+                  onMouseLeave={e => { e.target.style.background = '#f3f4f6'; }}
+                >
+                  &times;
+                </button>
+              </div>
+
+              {error && (
+                <div style={{
+                  background: '#fef2f2', borderLeft: '4px solid #ef4444',
+                  color: '#991b1b', padding: '12px 16px', borderRadius: '8px',
+                  marginBottom: '20px', fontSize: '14px', fontWeight: 500,
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleEditProfile}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={labelStyle}>Full Name</label>
+                  <input
+                    type="text" value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required style={inputStyle}
+                    onFocus={focusInput} onBlur={blurInput}
+                  />
+                </div>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={labelStyle}>Phone Number</label>
+                  <input
+                    type="tel" value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required style={inputStyle}
+                    onFocus={focusInput} onBlur={blurInput}
+                  />
+                </div>
+                <button
+                  type="submit" disabled={loading}
+                  style={{
+                    width: '100%', padding: '14px',
+                    background: 'linear-gradient(90deg, #2563eb, #4f46e5)',
+                    color: 'white', fontWeight: 700, fontSize: '15px',
+                    border: 'none', borderRadius: '12px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.7 : 1,
+                    transition: 'all 0.2s', fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => { if (!loading) e.target.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.35)'; }}
+                  onMouseLeave={e => { e.target.style.boxShadow = 'none'; }}
+                >
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </form>
             </div>
-
-            {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-
-            <form onSubmit={handleEditProfile} className="space-y-4">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Full Name</label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </button>
-            </form>
           </div>
         </div>
       )}
 
       {/* Change Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold">Change Password</h3>
-              <button onClick={() => setShowPasswordModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">
-                &times;
-              </button>
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, padding: '20px',
+          backdropFilter: 'blur(4px)',
+        }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowPasswordModal(false); }}
+        >
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.2)',
+            width: '100%',
+            maxWidth: '440px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '4px',
+              background: 'linear-gradient(90deg, #f59e0b, #d97706)',
+            }} />
+            <div style={{ padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#111827', margin: 0 }}>Change Password</h3>
+                <button
+                  onClick={() => setShowPasswordModal(false)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: '#f3f4f6', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '18px', color: '#6b7280', transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={e => { e.target.style.background = '#e5e7eb'; }}
+                  onMouseLeave={e => { e.target.style.background = '#f3f4f6'; }}
+                >
+                  &times;
+                </button>
+              </div>
+
+              {error && (
+                <div style={{
+                  background: '#fef2f2', borderLeft: '4px solid #ef4444',
+                  color: '#991b1b', padding: '12px 16px', borderRadius: '8px',
+                  marginBottom: '20px', fontSize: '14px', fontWeight: 500,
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleChangePassword}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={labelStyle}>Current Password</label>
+                  <input
+                    type="password" value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required style={inputStyle}
+                    onFocus={focusInput} onBlur={blurInput}
+                  />
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={labelStyle}>New Password</label>
+                  <input
+                    type="password" value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required style={inputStyle}
+                    onFocus={focusInput} onBlur={blurInput}
+                  />
+                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: '6px 0 0' }}>At least 6 characters</p>
+                </div>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={labelStyle}>Confirm New Password</label>
+                  <input
+                    type="password" value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required style={inputStyle}
+                    onFocus={focusInput} onBlur={blurInput}
+                  />
+                </div>
+                <button
+                  type="submit" disabled={loading}
+                  style={{
+                    width: '100%', padding: '14px',
+                    background: 'linear-gradient(90deg, #d97706, #b45309)',
+                    color: 'white', fontWeight: 700, fontSize: '15px',
+                    border: 'none', borderRadius: '12px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.7 : 1,
+                    transition: 'all 0.2s', fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => { if (!loading) e.target.style.boxShadow = '0 8px 25px rgba(217, 119, 6, 0.35)'; }}
+                  onMouseLeave={e => { e.target.style.boxShadow = 'none'; }}
+                >
+                  {loading ? 'Changing...' : 'Change Password'}
+                </button>
+              </form>
             </div>
-
-            {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Current Password</label>
-                <input
-                  type="password"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">New Password</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Confirm New Password</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-              >
-                {loading ? 'Changing...' : 'Change Password'}
-              </button>
-            </form>
           </div>
         </div>
       )}
