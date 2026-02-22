@@ -50,7 +50,7 @@ export const CreateSessionPage = () => {
         sport_type: formData.sportType,
         venue_id: parseInt(formData.venueId),
       });
-      navigate(`/sessions/${response.data.session.id}`);
+      navigate(`/sessions/${response.data.session.session_id}`);
     } catch (err) {
       setError(err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Failed to create session');
     } finally {

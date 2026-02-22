@@ -1,10 +1,12 @@
 import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AuthContext);
+  const redirectTo = location.state?.from || '/sessions';
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -24,7 +26,7 @@ export const LoginPage = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/sessions');
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
@@ -176,7 +178,7 @@ export const LoginPage = () => {
               </Link>
               <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>
                 Don't have an account?{' '}
-                <Link to="/signup" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                <Link to="/signup" state={{ from: redirectTo }} style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
                   Sign Up
                 </Link>
               </p>

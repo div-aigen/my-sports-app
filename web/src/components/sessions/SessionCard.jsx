@@ -14,7 +14,7 @@ export const SessionCard = ({ session }) => {
   const st = statusConfig[session.status] || statusConfig.open;
 
   return (
-    <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/sessions/${session.session_id}`} style={{ textDecoration: 'none' }}>
       <div style={{
         borderRadius: '16px',
         overflow: 'hidden',

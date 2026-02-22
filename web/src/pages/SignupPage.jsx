@@ -1,10 +1,12 @@
 import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
 export const SignupPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signup } = useContext(AuthContext);
+  const redirectTo = location.state?.from || '/sessions';
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -26,7 +28,7 @@ export const SignupPage = () => {
 
     try {
       await signup(formData.email, formData.password, formData.fullName, formData.phoneNumber);
-      navigate('/sessions');
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');
     } finally {
@@ -146,7 +148,7 @@ export const SignupPage = () => {
 
             <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px', margin: 0 }}>
               Already have an account?{' '}
-              <Link to="/login" style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>Login</Link>
+              <Link to="/login" state={{ from: redirectTo }} style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>Login</Link>
             </p>
           </div>
         </div>

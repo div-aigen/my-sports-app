@@ -7,7 +7,7 @@ import { getVenueBackground } from '../utils/venueImages';
 import { formatDate, formatTime } from '../utils/formatDate';
 
 export const SessionDetailsPage = () => {
-  const { id } = useParams();
+  const { id: sessionIdentifier } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { joinSessionRoom, leaveSessionRoom, on, off } = useWebSocket();
@@ -23,31 +23,40 @@ export const SessionDetailsPage = () => {
 
   useEffect(() => {
     fetchSession();
-    joinSessionRoom(id);
+  }, [sessionIdentifier]);
 
-    on('participant-joined', (data) => {
-      if (data.sessionId === parseInt(id)) fetchSession();
-    });
+  // Set up websocket after we have the numeric session id
+  useEffect(() => {
+    if (!session) return;
+    const numericId = session.id;
+    joinSessionRoom(numericId);
 
-    on('participant-left', (data) => {
-      if (data.sessionId === parseInt(id)) fetchSession();
-    });
+    const onJoined = (data) => {
+      if (data.sessionId === numericId) fetchSession();
+    };
+    const onLeft = (data) => {
+      if (data.sessionId === numericId) fetchSession();
+    };
+
+    on('participant-joined', onJoined);
+    on('participant-left', onLeft);
 
     return () => {
-      leaveSessionRoom(id);
-      off('participant-joined', null);
-      off('participant-left', null);
+      leaveSessionRoom(numericId);
+      off('participant-joined', onJoined);
+      off('participant-left', onLeft);
     };
-  }, [id]);
+  }, [session?.id]);
 
   const fetchSession = async () => {
     try {
-      const [sessionRes, participantsRes] = await Promise.all([
-        sessionAPI.get(id),
-        sessionAPI.getParticipants(id),
-      ]);
-
+      // Fetch session by session_id (backend supports UUID lookup)
+      const sessionRes = await sessionAPI.get(sessionIdentifier);
       const sessionData = sessionRes.data.session;
+
+      // Use numeric id for participants API
+      const participantsRes = await sessionAPI.getParticipants(sessionData.id);
+
       setSession(sessionData);
       setParticipants(participantsRes.data.participants);
 
@@ -72,7 +81,7 @@ export const SessionDetailsPage = () => {
   const handleJoin = async () => {
     setActionLoading(true);
     try {
-      await sessionAPI.join(id);
+      await sessionAPI.join(session.id);
       fetchSession();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to join session');
@@ -85,7 +94,7 @@ export const SessionDetailsPage = () => {
     if (!confirm('Are you sure you want to leave this session?')) return;
     setActionLoading(true);
     try {
-      await sessionAPI.leave(id);
+      await sessionAPI.leave(session.id);
       fetchSession();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to leave session');
@@ -98,7 +107,7 @@ export const SessionDetailsPage = () => {
     if (!confirm('Are you sure you want to cancel this session?')) return;
     setActionLoading(true);
     try {
-      await sessionAPI.cancel(id);
+      await sessionAPI.cancel(session.id);
       navigate('/sessions');
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to cancel session');

@@ -200,7 +200,7 @@ export const MySessionsPage = () => {
               }}>
                 {/* Card top — clickable */}
                 <div
-                  onClick={() => navigate(`/sessions/${session.id}`)}
+                  onClick={() => navigate(`/sessions/${session.session_id}`)}
                   style={{
                     position: 'relative',
                     minHeight: '180px',
