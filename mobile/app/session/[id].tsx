@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -9,14 +9,9 @@ export default function SessionDeepLinkScreen() {
   const { id } = useLocalSearchParams();
   const { user, token, loading } = useContext(AuthContext);
   const router = useRouter();
-  const [sessionId, setSessionId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      const parsedId = typeof id === 'string' ? parseInt(id, 10) : id;
-      setSessionId(parsedId);
-    }
-  }, [id]);
+  // id can be numeric (from in-app nav) or session_id UUID (from deep link)
+  const sessionIdentifier = typeof id === 'string' ? id : String(id);
 
   if (loading) {
     return (
@@ -32,7 +27,7 @@ export default function SessionDeepLinkScreen() {
   }
 
   // Show error if no session ID
-  if (!sessionId) {
+  if (!sessionIdentifier) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Invalid session link</Text>
@@ -40,10 +35,11 @@ export default function SessionDeepLinkScreen() {
     );
   }
 
-  // Show session detail screen
+  // Pass the identifier as-is — SessionDetailScreen uses sessionAPI.get()
+  // which supports both numeric id and session_id (UUID) lookup
   return (
     <SessionDetailScreen
-      route={{ params: { sessionId } }}
+      route={{ params: { sessionId: sessionIdentifier } }}
       navigation={{
         goBack: () => router.back(),
         navigate: (screen: string, params: any) => {

@@ -33,6 +33,18 @@
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "lineup-sports.vercel.app",
+              "pathPrefix": "/sessions/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
@@ -61,7 +73,9 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
+      "router": {
+        "origin": "https://lineup-sports.vercel.app"
+      },
       "eas": {
         "projectId": "efd7de3b-0c1e-4726-a98f-ae5bb178ea56"
       }
