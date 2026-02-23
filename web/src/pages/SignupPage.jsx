@@ -75,17 +75,11 @@ export const SignupPage = () => {
           <div style={{ padding: '40px 36px' }}>
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <div style={{
-                width: '64px', height: '64px',
-                background: 'linear-gradient(135deg, #dbeafe, #e0e7ff)',
-                borderRadius: '16px',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '16px', boxShadow: '0 4px 14px rgba(59, 130, 246, 0.15)',
-              }}>
-                <svg width="32" height="32" fill="none" stroke="#2563eb" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-              </div>
+              <img src="/images/logo.png" alt="Lineup" style={{
+                width: '72px', height: '72px',
+                marginBottom: '16px', alignItems: 'center',
+                display: 'inline-flex', justifyContent: 'center'
+              }} />
               <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', margin: '0 0 8px' }}>Lineup</h1>
               <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, fontWeight: 500 }}>Join the game, build your squad</p>
             </div>

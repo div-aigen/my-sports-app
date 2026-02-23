@@ -59,17 +59,11 @@ export const ForgotPasswordPage = () => {
           <div style={{ padding: '40px 36px' }}>
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <div style={{
-                width: '64px', height: '64px',
-                background: 'linear-gradient(135deg, #dbeafe, #e0e7ff)',
-                borderRadius: '16px',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '16px', boxShadow: '0 4px 14px rgba(59, 130, 246, 0.15)',
-              }}>
-                <svg width="32" height="32" fill="none" stroke="#2563eb" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
+              <img src="/images/logo.png" alt="Lineup" style={{
+                width: '72px', height: '72px',
+                marginBottom: '16px', alignItems: 'center',
+                display: 'inline-flex', justifyContent: 'center'
+              }} />
               <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', margin: '0 0 8px' }}>Forgot Password?</h1>
               <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, fontWeight: 500 }}>We'll send you a reset code</p>
             </div>

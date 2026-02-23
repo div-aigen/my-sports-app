@@ -1,9 +1,9 @@
 const venueBackgrounds = {
-  'Harmony Park': '/images/venues/yolo_gaming_arena.png',
-  'Aishbagh Sports Complex': '/images/venues/aishbagh_sports_complex.jpg',
-  'Central Stadium': '/images/venues/central_stadium.png',
-  'Jai Prakash Park': '/images/venues/jai_pakash_park.png',
-  'Ram Manohar Lohia Park': '/images/venues/ram_manohar.png',
+  'Yolo Sports Arena': '/images/venues/yolo_gaming_arena.png',
+  'Puff N Play Sports Arena': '/images/venues/aishbagh_sports_complex.jpg',
+  'D & C Sports Turf': '/images/venues/central_stadium.png',
+  'The Urban Turf': '/images/venues/jai_pakash_park.png',
+  'Dugout Sports Arena': '/images/venues/ram_manohar.png',
 };
 
 export const getVenueBackground = (locationAddress) => {

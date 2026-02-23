@@ -52,13 +52,17 @@ export const Layout = () => {
         }}>
           {/* Logo */}
           <NavLink to="/sessions" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
             fontSize: '22px',
             fontWeight: 800,
             color: 'white',
             textDecoration: 'none',
             letterSpacing: '-0.5px',
           }}>
-            Lineup
+            <img src="/images/logo.png" alt="Lineup" style={{ width: '32px', height: '32px' }} />
+            Lineup: Find Your Game
           </NavLink>
 
           {/* Desktop nav links */}

@@ -193,11 +193,11 @@ const SessionsListScreen = ({ navigation = null }) => {
   };
 
   const venueBackgrounds = {
-    'Harmony Park': require('../../../assets/images/yolo_gaming_arena.png'),
-    'Aishbagh Sports Complex': require('../../../assets/images/aishbagh_sports_complex.jpg'),
-    'Central Stadium': require('../../../assets/images/central_stadium.png'),
-    'Jai Prakash Park': require('../../../assets/images/jai_pakash_park.png'),
-    'Ram Manohar Lohia Park': require('../../../assets/images/ram_manohar.png'),
+    'Yolo Sports Arena': require('../../../assets/images/yolo_gaming_arena.png'),
+    'Puff N Play Sports Arena': require('../../../assets/images/aishbagh_sports_complex.jpg'),
+    'D & C Sports Turf': require('../../../assets/images/central_stadium.png'),
+    'The Urban Turf': require('../../../assets/images/jai_pakash_park.png'),
+    'Dugout Sports Arena': require('../../../assets/images/ram_manohar.png'),
   };
 
   const getVenueBackground = (locationAddress) => {
