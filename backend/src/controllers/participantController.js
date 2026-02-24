@@ -1,4 +1,6 @@
 const Participant = require('../models/Participant');
+const notificationService = require('../services/notificationService');
+const pool = require('../config/database');
 
 const joinSession = async (req, res) => {
   try {
@@ -12,6 +14,18 @@ const joinSession = async (req, res) => {
       sessionId,
       participant,
     });
+
+    // Send push notification if session is now full
+    try {
+      const sessionResult = await pool.query('SELECT * FROM sessions WHERE id = $1', [sessionId]);
+      const session = sessionResult.rows[0];
+      if (session && session.status === 'full') {
+        const participants = await Participant.findBySessionId(sessionId);
+        notificationService.notifySessionFull(session, participants);
+      }
+    } catch (notifErr) {
+      console.error('Notification error (non-blocking):', notifErr);
+    }
 
     res.status(201).json({
       message: 'Joined session successfully',
