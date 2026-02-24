@@ -72,4 +72,11 @@ router.post(
   authController.resetPassword
 );
 
+// POST /api/auth/push-token
+router.post(
+  '/push-token',
+  authenticateToken,
+  authController.registerPushToken
+);
+
 module.exports = router;
