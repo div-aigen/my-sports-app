@@ -192,6 +192,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const registerPushToken = async (req, res) => {
+  const { token } = req.body;
+  const userId = req.user.id;
+
+  if (!token) {
+    return res.status(400).json({ error: 'Push token is required' });
+  }
+
+  try {
+    await User.updatePushToken(userId, token);
+    res.json({ message: 'Push token registered successfully' });
+  } catch (err) {
+    console.error('Register push token error:', err);
+    res.status(500).json({ error: 'Failed to register push token' });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -200,4 +217,5 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  registerPushToken,
 };

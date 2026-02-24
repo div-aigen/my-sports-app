@@ -83,6 +83,23 @@ class User {
     return result.rows[0];
   }
 
+  static async updatePushToken(userId, token) {
+    const result = await pool.query(
+      'UPDATE users SET expo_push_token = $1 WHERE id = $2 RETURNING id, email, full_name',
+      [token, userId]
+    );
+    return result.rows[0];
+  }
+
+  static async getPushTokensByUserIds(userIds) {
+    if (!userIds.length) return [];
+    const result = await pool.query(
+      'SELECT id, expo_push_token FROM users WHERE id = ANY($1) AND expo_push_token IS NOT NULL',
+      [userIds]
+    );
+    return result.rows;
+  }
+
   static async resetPasswordWithToken(email, token, newPassword) {
     // Verify token is valid
     const user = await this.verifyResetToken(email, token);
