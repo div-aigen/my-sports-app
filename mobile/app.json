@@ -41,7 +41,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "lineup-sports.vercel.app",
+              "host": "lineup-sports.in",
               "pathPrefix": "/sessions/"
             }
           ],
@@ -82,7 +82,7 @@
     },
     "extra": {
       "router": {
-        "origin": "https://lineup-sports.vercel.app"
+        "origin": "https://lineup-sports.in"
       },
       "eas": {
         "projectId": "efd7de3b-0c1e-4726-a98f-ae5bb178ea56"
