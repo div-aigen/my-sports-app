@@ -9,6 +9,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5174',
   'https://lineup-sports.in',
+  'https://www.lineup-sports.in',
 ];
 
 // Also allow any *.vercel.app subdomain for preview deploys
