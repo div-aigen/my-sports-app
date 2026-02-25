@@ -19,9 +19,11 @@ const joinSession = async (req, res) => {
     try {
       const sessionResult = await pool.query('SELECT * FROM sessions WHERE id = $1', [sessionId]);
       const session = sessionResult.rows[0];
+      console.log(`[NOTIF] Session ${sessionId} status after join: ${session?.status}`);
       if (session && session.status === 'full') {
         const participants = await Participant.findBySessionId(sessionId);
-        notificationService.notifySessionFull(session, participants);
+        console.log(`[NOTIF] Session full! Sending notifications to ${participants.length} participants`);
+        await notificationService.notifySessionFull(session, participants);
       }
     } catch (notifErr) {
       console.error('Notification error (non-blocking):', notifErr);

@@ -202,6 +202,7 @@ const registerPushToken = async (req, res) => {
 
   try {
     await User.updatePushToken(userId, token);
+    console.log(`[NOTIF] Push token registered for user ${userId}: ${token}`);
     res.json({ message: 'Push token registered successfully' });
   } catch (err) {
     console.error('Register push token error:', err);

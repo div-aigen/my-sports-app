@@ -4,9 +4,11 @@ const User = require('../models/User');
 const expo = new Expo();
 
 async function sendPushNotifications(userIds, title, body, data = {}) {
+  console.log(`[NOTIF] sendPushNotifications called for ${userIds.length} users:`, userIds);
   if (!userIds.length) return;
 
   const users = await User.getPushTokensByUserIds(userIds);
+  console.log(`[NOTIF] Found ${users.length} users with push tokens`);
   const messages = [];
 
   for (const user of users) {
@@ -25,6 +27,7 @@ async function sendPushNotifications(userIds, title, body, data = {}) {
     });
   }
 
+  console.log(`[NOTIF] Sending ${messages.length} push messages`);
   if (!messages.length) return;
 
   const chunks = expo.chunkPushNotifications(messages);
