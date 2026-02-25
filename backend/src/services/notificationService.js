@@ -49,7 +49,7 @@ async function sendPushNotifications(userIds, title, body, data = {}) {
 async function notifySessionFull(session, participants) {
   const userIds = participants.map(p => p.user_id);
   const title = 'Session Full!';
-  const body = `"${session.sport}" session at ${session.location_address} is now full with ${session.max_participants} players.`;
+  const body = `"${session.sport_type}" session at ${session.location_address} is now full with ${session.max_participants} players.`;
 
   await sendPushNotifications(userIds, title, body, {
     type: 'session_full',
