@@ -25,6 +25,10 @@ dist/
 .next/
 out/
 
+# Service account keys (secrets)
+*-firebase-adminsdk-*.json
+my-sports-app-*.json
+
 # Mobile specific
 .expo/
 .expo-shared/
