@@ -46,6 +46,7 @@ export const authAPI = {
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (email, token, newPassword) =>
     api.post('/auth/reset-password', { email, token, new_password: newPassword }),
+  registerPushToken: (token) => api.post('/auth/push-token', { token }),
 };
 
 export const venueAPI = {
