@@ -10,7 +10,7 @@ class EmailService {
     try {
       const msg = {
         to: email,
-        from: 'divyanshukatiyar92@gmail.com', // SendGrid verified sender email
+        from: { email: 'noreply@lineup-sports.in', name: 'Lineup Sports' },
         subject: 'Password Reset Code - My Sports App',
         text: textContent,
         html: htmlContent,
@@ -32,7 +32,7 @@ class EmailService {
     try {
       const msg = {
         to: email,
-        from: 'divyanshukatiyar92@gmail.com',
+        from: { email: 'noreply@lineup-sports.in', name: 'Lineup Sports' },
         subject: 'Verify Your Email - My Sports App',
         text: textContent,
         html: htmlContent,
