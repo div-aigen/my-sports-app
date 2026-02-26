@@ -19,7 +19,7 @@ class User {
   }
 
   static async findById(id) {
-    const result = await pool.query('SELECT id, email, full_name, phone_number FROM users WHERE id = $1', [id]);
+    const result = await pool.query('SELECT id, email, full_name, phone_number, email_verified FROM users WHERE id = $1', [id]);
     return result.rows[0];
   }
 
@@ -98,6 +98,48 @@ class User {
       [userIds]
     );
     return result.rows;
+  }
+
+  static async createVerificationToken(email) {
+    const token = crypto.randomBytes(3).toString('hex');
+    const expiry = new Date(Date.now() + 3600000);
+
+    const result = await pool.query(
+      'UPDATE users SET verification_token = $1, verification_token_expiry = $2 WHERE email = $3 RETURNING email',
+      [token, expiry, email]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    return token;
+  }
+
+  static async verifyEmail(email, token) {
+    const result = await pool.query(
+      'SELECT id, email, full_name FROM users WHERE email = $1 AND verification_token = $2 AND verification_token_expiry > NOW()',
+      [email, token]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Invalid or expired verification code');
+    }
+
+    await pool.query(
+      'UPDATE users SET email_verified = TRUE, verification_token = NULL, verification_token_expiry = NULL WHERE id = $1',
+      [result.rows[0].id]
+    );
+
+    return result.rows[0];
+  }
+
+  static async isEmailVerified(userId) {
+    const result = await pool.query(
+      'SELECT email_verified FROM users WHERE id = $1',
+      [userId]
+    );
+    return result.rows[0]?.email_verified || false;
   }
 
   static async resetPasswordWithToken(email, token, newPassword) {

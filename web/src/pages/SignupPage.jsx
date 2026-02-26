@@ -28,7 +28,7 @@ export const SignupPage = () => {
 
     try {
       await signup(formData.email, formData.password, formData.fullName, formData.phoneNumber);
-      navigate(redirectTo, { replace: true });
+      navigate('/verify-email', { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');
     } finally {

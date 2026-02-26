@@ -54,9 +54,7 @@ const LoginScreen = ({ showSignup = false }) => {
     setLoading(true);
     try {
       await signup(email, password, fullName, phoneNumber);
-      Alert.alert('Success', 'Account created successfully. Please login.');
-      setIsSignup(false);
-      setPassword('');
+      // AuthContext now sets token/user, HomeScreen will show VerifyEmailScreen
     } catch (err) {
       const errorMessage = err.response?.data?.error || err.message || 'Something went wrong';
       console.log('Signup error:', err);

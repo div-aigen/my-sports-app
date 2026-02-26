@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, requireVerifiedEmail } = require('../middleware/auth');
 const sessionController = require('../controllers/sessionController');
 const participantController = require('../controllers/participantController');
 
@@ -16,6 +16,7 @@ router.get('/:id', sessionController.getSession);
 router.post(
   '/',
   authenticateToken,
+  requireVerifiedEmail,
   [
     body('title').notEmpty().withMessage('Title is required'),
     body('location_address').notEmpty().withMessage('Location is required'),
@@ -34,6 +35,7 @@ router.post(
 router.put(
   '/:id',
   authenticateToken,
+  requireVerifiedEmail,
   [
     body('title').optional().notEmpty(),
     body('location_address').optional().notEmpty(),
@@ -46,13 +48,13 @@ router.put(
 );
 
 // DELETE /api/sessions/:id
-router.delete('/:id', authenticateToken, sessionController.cancelSession);
+router.delete('/:id', authenticateToken, requireVerifiedEmail, sessionController.cancelSession);
 
 // POST /api/sessions/:id/join
-router.post('/:id/join', authenticateToken, participantController.joinSession);
+router.post('/:id/join', authenticateToken, requireVerifiedEmail, participantController.joinSession);
 
 // DELETE /api/sessions/:id/leave
-router.delete('/:id/leave', authenticateToken, participantController.leaveSession);
+router.delete('/:id/leave', authenticateToken, requireVerifiedEmail, participantController.leaveSession);
 
 // GET /api/sessions/:id/participants
 router.get('/:id/participants', participantController.getParticipants);

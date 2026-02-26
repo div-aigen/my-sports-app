@@ -11,6 +11,7 @@ import { CreateSessionPage } from './pages/CreateSessionPage';
 import { SessionDetailsPage } from './pages/SessionDetailsPage';
 import { MySessionsPage } from './pages/MySessionsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<ProtectedRoute allowUnverified><VerifyEmailPage /></ProtectedRoute>} />
 
           {/* Protected routes with shared layout */}
           <Route

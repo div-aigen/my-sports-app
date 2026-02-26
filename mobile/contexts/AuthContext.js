@@ -32,6 +32,11 @@ export const AuthProvider = ({ children }) => {
   const signup = async (email, password, fullName, phoneNumber) => {
     try {
       const response = await authAPI.signup(email, password, fullName, phoneNumber);
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+        setToken(response.data.token);
+        setUser(response.data.user);
+      }
       return response.data;
     } catch (err) {
       console.error('Signup error in context:', err);
@@ -60,8 +65,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const markEmailVerified = () => {
+    setUser(prev => prev ? { ...prev, email_verified: true } : prev);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, signup, login, logout, markEmailVerified }}>
       {children}
     </AuthContext.Provider>
   );

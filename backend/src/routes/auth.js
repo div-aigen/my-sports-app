@@ -72,6 +72,24 @@ router.post(
   authController.resetPassword
 );
 
+// POST /api/auth/verify-email
+router.post(
+  '/verify-email',
+  authenticateToken,
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+    body('token').trim().notEmpty().withMessage('Verification code is required'),
+  ],
+  authController.verifyEmail
+);
+
+// POST /api/auth/resend-verification
+router.post(
+  '/resend-verification',
+  authenticateToken,
+  authController.resendVerification
+);
+
 // POST /api/auth/push-token
 router.post(
   '/push-token',

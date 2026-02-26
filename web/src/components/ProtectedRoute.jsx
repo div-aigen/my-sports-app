@@ -2,8 +2,8 @@ import { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
-export const ProtectedRoute = ({ children }) => {
-  const { token, loading } = useContext(AuthContext);
+export const ProtectedRoute = ({ children, allowUnverified = false }) => {
+  const { user, token, loading } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) {
@@ -19,6 +19,10 @@ export const ProtectedRoute = ({ children }) => {
 
   if (!token) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+
+  if (!allowUnverified && user && !user.email_verified) {
+    return <Navigate to="/verify-email" replace />;
   }
 
   return children;

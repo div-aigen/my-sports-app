@@ -60,8 +60,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const markEmailVerified = () => {
+    setUser(prev => prev ? { ...prev, email_verified: true } : prev);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, signup, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, loading, signup, login, logout, refreshUser, markEmailVerified }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,12 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { AuthContext } from '../../contexts/AuthContext';
 import LoginScreen from '../screens/auth/LoginScreen';
+import VerifyEmailScreen from '../screens/auth/VerifyEmailScreen';
 import SessionsListScreen from '../screens/sessions/SessionsListScreen';
 
 export default function HomeScreen() {
   const { user, token, loading } = useContext(AuthContext);
-  const router = useRouter();
 
   if (loading) {
     return (
@@ -22,7 +21,12 @@ export default function HomeScreen() {
     return <LoginScreen />;
   }
 
-  // Show sessions list if authenticated
+  // Show verification screen if email not verified
+  if (!user.email_verified) {
+    return <VerifyEmailScreen />;
+  }
+
+  // Show sessions list if authenticated and verified
   return <SessionsListScreen />;
 }
 

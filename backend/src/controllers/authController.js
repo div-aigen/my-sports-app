@@ -20,9 +20,17 @@ const signup = async (req, res) => {
     const user = await User.create(email, password, full_name, phone_number);
     const token = User.generateToken(user);
 
+    // Generate verification token and send email
+    try {
+      const verificationToken = await User.createVerificationToken(email);
+      await emailService.sendVerificationEmail(email, verificationToken, full_name);
+    } catch (emailErr) {
+      console.error('Failed to send verification email:', emailErr);
+    }
+
     res.status(201).json({
-      message: 'User created successfully',
-      user,
+      message: 'User created successfully. Please verify your email.',
+      user: { ...user, email_verified: false },
       token,
     });
   } catch (err) {
@@ -51,11 +59,11 @@ const login = async (req, res) => {
     }
 
     const token = User.generateToken(user);
-    const { password_hash, ...userWithoutPassword } = user;
+    const { password_hash, reset_token, reset_token_expiry, verification_token, verification_token_expiry, ...userWithoutSensitive } = user;
 
     res.json({
       message: 'Login successful',
-      user: userWithoutPassword,
+      user: userWithoutSensitive,
       token,
     });
   } catch (err) {
@@ -210,6 +218,50 @@ const registerPushToken = async (req, res) => {
   }
 };
 
+const verifyEmail = async (req, res) => {
+  const { email, token } = req.body;
+
+  if (!email || !token) {
+    return res.status(400).json({ error: 'Email and verification code are required' });
+  }
+
+  try {
+    await User.verifyEmail(email, token);
+    res.json({ message: 'Email verified successfully' });
+  } catch (err) {
+    console.error('Verify email error:', err);
+    res.status(400).json({ error: 'Invalid or expired verification code. Please request a new one.' });
+  }
+};
+
+const resendVerification = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.email_verified) {
+      return res.status(400).json({ error: 'Email is already verified' });
+    }
+
+    const verificationToken = await User.createVerificationToken(user.email);
+    try {
+      await emailService.sendVerificationEmail(user.email, verificationToken, user.full_name);
+    } catch (emailErr) {
+      console.error('Failed to send verification email:', emailErr);
+      return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
+    }
+
+    res.json({ message: 'Verification code sent to your email' });
+  } catch (err) {
+    console.error('Resend verification error:', err);
+    res.status(500).json({ error: 'Failed to resend verification code' });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -219,4 +271,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   registerPushToken,
+  verifyEmail,
+  resendVerification,
 };

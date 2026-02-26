@@ -25,6 +25,169 @@ class EmailService {
     }
   }
 
+  async sendVerificationEmail(email, token, userName) {
+    const htmlContent = this.getVerificationEmailHTML(userName, token);
+    const textContent = this.getVerificationEmailText(userName, token);
+
+    try {
+      const msg = {
+        to: email,
+        from: 'divyanshukatiyar92@gmail.com',
+        subject: 'Verify Your Email - My Sports App',
+        text: textContent,
+        html: htmlContent,
+      };
+
+      const result = await sgMail.send(msg);
+      console.log(`✓ Verification email sent to ${email}`);
+      return result;
+    } catch (error) {
+      console.error(`✗ Failed to send verification email to ${email}:`, error.message);
+      throw error;
+    }
+  }
+
+  getVerificationEmailHTML(userName, token) {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      background: white;
+      padding: 30px;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .token-box {
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 8px;
+      text-align: center;
+      background: #e8f5e9;
+      padding: 25px;
+      border-radius: 8px;
+      color: #2E7D32;
+      font-family: 'Courier New', monospace;
+      margin: 25px 0;
+      border: 2px solid #4CAF50;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px 20px;
+      border-left: 4px solid #2196F3;
+      margin: 25px 0;
+      border-radius: 4px;
+    }
+    .info strong {
+      color: #1565C0;
+    }
+    .info ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .info li {
+      margin: 5px 0;
+      color: #1565C0;
+    }
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to My Sports App!</h1>
+    </div>
+
+    <div class="content">
+      <p>Hi <strong>${userName}</strong>,</p>
+
+      <p>Thanks for signing up! Please verify your email address by entering the code below in the app:</p>
+
+      <div class="token-box">${token}</div>
+
+      <p style="text-align: center; color: #666; margin: 20px 0;">
+        <strong>Enter this code in the app to verify your email</strong>
+      </p>
+
+      <div class="info">
+        <strong>Note:</strong>
+        <ul>
+          <li>This code expires in <strong>1 hour</strong></li>
+          <li>You can request a new code from the app if this one expires</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <p style="color: #999; font-size: 13px;">
+        If you didn't create an account with My Sports App, you can safely ignore this email.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>This is an automated message from My Sports App</p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+  }
+
+  getVerificationEmailText(userName, token) {
+    return `
+Hi ${userName},
+
+Thanks for signing up for My Sports App!
+
+Your email verification code is: ${token}
+
+This code expires in 1 hour. You can request a new code from the app if this one expires.
+
+Enter this code in the app to verify your email and start using My Sports App.
+
+If you didn't create an account, you can safely ignore this email.
+
+---
+This is an automated message from My Sports App
+    `;
+  }
+
   getPasswordResetEmailHTML(userName, resetToken) {
     return `
 <!DOCTYPE html>

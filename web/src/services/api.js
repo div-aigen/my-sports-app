@@ -23,6 +23,8 @@ export const authAPI = {
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (email, token, newPassword) =>
     api.post('/auth/reset-password', { email, token, new_password: newPassword }),
+  verifyEmail: (email, token) => api.post('/auth/verify-email', { email, token }),
+  resendVerification: () => api.post('/auth/resend-verification'),
 };
 
 export const sessionAPI = {
