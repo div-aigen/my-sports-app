@@ -122,7 +122,7 @@ const SessionDetailsModal = ({
   const handleShareSession = async () => {
     if (!session) return;
     try {
-      const sessionLink = `sportsapp://session/${session.session_id}`;
+      const sessionLink = `https://lineup-sports.in/sessions/${session.session_id}`;
       const message =
         `🏆 Join my ${session.title} session!\n\n` +
         `📅 Date: ${formatDateTime(session.scheduled_date)}\n` +
