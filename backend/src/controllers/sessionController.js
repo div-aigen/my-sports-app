@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const Session = require('../models/Session');
+const Participant = require('../models/Participant');
+const notificationService = require('../services/notificationService');
 
 const createSession = async (req, res) => {
   const errors = validationResult(req);
@@ -141,7 +143,26 @@ const cancelSession = async (req, res) => {
     const sessionId = parseInt(req.params.id);
     const creatorId = req.user.id;
 
+    // Fetch participants before cancelling so we can notify them
+    const participants = await Participant.findBySessionId(sessionId);
+
     const session = await Session.cancel(sessionId, creatorId);
+
+    // Notify all participants (excluding creator)
+    try {
+      const otherParticipants = participants.filter(p => p.user_id !== creatorId);
+      if (otherParticipants.length > 0) {
+        const userIds = otherParticipants.map(p => p.user_id);
+        notificationService.sendPushNotifications(
+          userIds,
+          'Session Cancelled',
+          `"${session.title}" scheduled for ${new Date(session.scheduled_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} has been cancelled by the organiser.`,
+          { type: 'session_cancelled', sessionId: session.id }
+        );
+      }
+    } catch (notifErr) {
+      console.error('Notification error (non-blocking):', notifErr);
+    }
 
     res.json({
       message: 'Session cancelled successfully',

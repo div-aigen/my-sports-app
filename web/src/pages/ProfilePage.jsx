@@ -9,6 +9,36 @@ export const ProfilePage = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const faqs = [
+    {
+      q: 'How do I join a session?',
+      a: 'Browse open sessions on the Sessions page and click "Join Session". You\'ll be added to the participant list and your cost per person will be calculated automatically.',
+    },
+    {
+      q: 'How is the cost per person calculated?',
+      a: 'The total session cost is divided equally among all active participants. As more people join, your share decreases.',
+    },
+    {
+      q: 'Can I leave a session after joining?',
+      a: 'Yes, you can leave a session as long as it hasn\'t started yet. If you\'re the creator, ownership will be transferred to another participant. \
+      Note that as a creator if you the only person in the session, then you cannot leave it. In this case you have to cancel the session entirely.',
+    },
+    {
+      q: 'What is an invite code?',
+      a: 'Each session has a unique invite code. Share it with friends so they can find and join the session directly using "Join by Code" in the app. \
+      Alternatively, they can click on the link provided by the invite and join the session.',
+    },
+    {
+      q: 'Will I get notified when a session is full?',
+      a: 'Yes! If you have the mobile app installed, you\'ll receive a push notification when a session you\'ve joined reaches its maximum number of players.',
+    },
+    {
+      q: 'How do I cancel a session I created?',
+      a: 'Go to "My Sessions -> Created" and tap the Cancel button. This will remove the session and notify all participants.',
+    },
+  ];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -276,6 +306,66 @@ export const ProfilePage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
+      </div>
+
+      {/* FAQ */}
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        overflow: 'hidden',
+        marginBottom: '20px',
+      }}>
+        <h3 style={{
+          padding: '18px 24px 12px',
+          fontSize: '12px',
+          fontWeight: 700,
+          color: '#9ca3af',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          margin: 0,
+        }}>
+          FAQ
+        </h3>
+
+        {faqs.map((faq, i) => (
+          <div key={i}>
+            {i > 0 && <div style={{ height: '1px', background: '#f3f4f6', margin: '0 24px' }} />}
+            <button
+              onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 24px',
+                background: 'white',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'inherit',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
+            >
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#111827', paddingRight: '12px' }}>
+                {faq.q}
+              </span>
+              <svg
+                width="18" height="18" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24"
+                style={{ flexShrink: 0, transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {openFaq === i && (
+              <div style={{ padding: '0 24px 16px', fontSize: '14px', color: '#6b7280', lineHeight: 1.6 }}>
+                {faq.a}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Logout */}
