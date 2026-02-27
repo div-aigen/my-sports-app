@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
   ImageBackground,
+  Linking,
 } from 'react-native';
 import styles from './LoginScreen.styles';
 import { useRouter } from 'expo-router';
@@ -160,6 +161,10 @@ const LoginScreen = ({ showSignup = false }) => {
           <Text style={styles.link}>
             {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
           </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => Linking.openURL('https://www.lineup-sports.in/privacy')} style={{ marginTop: 16 }}>
+          <Text style={[styles.link, { fontSize: 12, opacity: 0.7 }]}>Privacy Policy</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

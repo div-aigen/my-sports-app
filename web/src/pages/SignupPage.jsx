@@ -148,7 +148,8 @@ export const SignupPage = () => {
         </div>
 
         <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '24px' }}>
-          Secure • Privacy Protected • Fast
+          Secure • Fast •{' '}
+          <a href="/privacy" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'underline' }}>Privacy Policy</a>
         </p>
       </div>
     </div>

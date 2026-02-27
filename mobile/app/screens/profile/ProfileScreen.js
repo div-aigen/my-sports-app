@@ -248,6 +248,17 @@ const ProfileScreen = () => {
             </View>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL('https://www.lineup-sports.in/privacy')}>
+            <View style={styles.settingLeft}>
+              <Text style={styles.settingIcon}>📄</Text>
+              <View>
+                <Text style={styles.settingLabel}>Privacy Policy</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>How we handle your data</Text>
+              </View>
+            </View>
+            <Text style={styles.settingArrow}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Logout Button */}

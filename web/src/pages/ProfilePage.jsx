@@ -415,6 +415,35 @@ export const ProfilePage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </a>
+        <div style={{ height: '1px', background: '#f3f4f6', margin: '0 24px' }} />
+        <a
+          href="/privacy"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 24px', textDecoration: 'none', color: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px',
+              background: '#f5f3ff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" fill="none" stroke="#7c3aed" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: 0 }}>Privacy Policy</p>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>How we handle your data</p>
+            </div>
+          </div>
+          <svg width="20" height="20" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
       </div>
 
       {/* Logout */}
