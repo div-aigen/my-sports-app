@@ -432,44 +432,44 @@ const ProfileScreen = () => {
 
             <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>How does cost splitting work?</Text>
+                <Text style={styles.faqQuestion}>How do I join a session?</Text>
                 <Text style={styles.faqAnswer}>
-                  When you create a session, you set the total cost. This cost is automatically split equally among all participants.
+                  Browse open sessions on the Home tab and tap "Join Session". You'll be added to the participant list and your cost per person will be calculated automatically.
                 </Text>
               </View>
 
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>Can I cancel a session?</Text>
+                <Text style={styles.faqQuestion}>How is the cost per person calculated?</Text>
                 <Text style={styles.faqAnswer}>
-                  Yes, as a session creator, you can cancel the session anytime. All participants will be notified.
+                  The total session cost is divided equally among all active participants. As more people join, your share decreases.
                 </Text>
               </View>
 
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>What if the session creator leaves?</Text>
+                <Text style={styles.faqQuestion}>Can I leave a session after joining?</Text>
                 <Text style={styles.faqAnswer}>
-                  If the creator leaves and there are other participants, ownership transfers to a random participant.
+                  Yes, you can leave a session as long as it hasn't started yet. If you're the creator, ownership will be transferred to another participant. Note that as a creator if you're the only person in the session, then you cannot leave it. In this case you have to cancel the session entirely.
                 </Text>
               </View>
 
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>Can I edit a session after creating it?</Text>
+                <Text style={styles.faqQuestion}>What is an invite code?</Text>
                 <Text style={styles.faqAnswer}>
-                  Currently, you can cancel and create a new session. In future updates, editing will be available.
+                  Each session has a unique invite code. Share it with friends so they can find and join the session directly using "Join by Code" in the app. Alternatively, they can click on the link provided by the invite and join the session.
                 </Text>
               </View>
 
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>How do I find sessions near me?</Text>
+                <Text style={styles.faqQuestion}>Will I get notified when a session is full?</Text>
                 <Text style={styles.faqAnswer}>
-                  Browse the Home tab to see all available sessions. Use the date filter to find sessions on specific dates.
+                  Yes! You'll receive a push notification when a session you've joined reaches its maximum number of players.
                 </Text>
               </View>
 
               <View style={styles.faqItem}>
-                <Text style={styles.faqQuestion}>Can I see my past sessions?</Text>
+                <Text style={styles.faqQuestion}>How do I cancel a session I created?</Text>
                 <Text style={styles.faqAnswer}>
-                  Go to My Sessions tab to see all sessions you've created or joined.
+                  Go to "My Sessions" and tap the Cancel button. This will remove the session and notify all participants.
                 </Text>
               </View>
             </ScrollView>
