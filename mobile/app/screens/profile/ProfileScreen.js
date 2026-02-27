@@ -130,7 +130,8 @@ const ProfileScreen = () => {
       )}
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
+        <View style={[styles.header, { flexDirection: 'row', alignItems: 'center' }]}>
+          <Image source={require('../../../assets/images/sport_5351478.png')} style={{ width: 32, height: 32, marginRight: 8, borderRadius: 8 }} />
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Profile</Text>
         </View>
 

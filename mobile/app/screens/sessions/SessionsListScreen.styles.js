@@ -11,13 +11,16 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: 'rgba(33, 150, 243, 0.6)',
     paddingTop: 50,
-    paddingHorizontal: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
     paddingBottom: 20,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 40,
+    fontWeight: '900',
     color: 'white',
+    fontFamily: 'cursive',
+    letterSpacing: 0.5,
   },
   headerSubtitle: {
     fontSize: 14,

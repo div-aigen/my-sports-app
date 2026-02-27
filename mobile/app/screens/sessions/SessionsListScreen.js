@@ -13,6 +13,7 @@ import {
   ImageBackground,
   ScrollView,
   Platform,
+  Image,
 } from 'react-native';
 import styles from './SessionsListScreen.styles';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -355,9 +356,12 @@ const SessionsListScreen = ({ navigation = null }) => {
         </ImageBackground>
       )}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)' }]}>
-        <View>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Lineup Sessions</Text>
-          <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}!</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Image source={require('../../../assets/images/sport_5351478.png')} style={{ width: 32, height: 32, marginRight: 8, borderRadius: 8 }} />
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Lineup Sessions</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}! </Text>
+          </View>
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity

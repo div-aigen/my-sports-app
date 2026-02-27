@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   ImageBackground,
+  Image,
 } from 'react-native';
 import styles from './MySessionsScreen.styles';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -268,9 +269,12 @@ const MySessionsScreen = () => {
       )}
 
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)' }]}>
-        <View>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>My Sessions</Text>
-          <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}!</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Image source={require('../../../assets/images/sport_5351478.png')} style={{ width: 32, height: 32, marginRight: 8, borderRadius: 8 }} />
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.headerTitle, { color: theme.colors.text }]}>My Sessions</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Welcome, {user?.full_name}!</Text>
+          </View>
         </View>
       </View>
 
