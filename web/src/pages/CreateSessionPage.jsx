@@ -93,7 +93,7 @@ export const CreateSessionPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '32px 20px' }}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '24px 16px' }}>
       {/* Page header */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>
@@ -116,7 +116,7 @@ export const CreateSessionPage = () => {
           background: 'linear-gradient(90deg, #22c55e, #3b82f6, #4f46e5)',
         }} />
 
-        <div style={{ padding: '32px' }}>
+        <div style={{ padding: '24px 20px' }}>
           {error && (
             <div style={{
               background: '#fef2f2',
@@ -206,21 +206,23 @@ export const CreateSessionPage = () => {
               </div>
             </div>
 
-            {/* Date & Time */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-              <div>
-                <label style={labelStyle}>Date <span style={{ color: '#ef4444' }}>*</span></label>
-                <input
-                  type="date"
-                  name="scheduledDate"
-                  value={formData.scheduledDate}
-                  onChange={handleChange}
-                  required
-                  style={inputStyle}
-                  onFocus={focusInput}
-                  onBlur={blurInput}
-                />
-              </div>
+            {/* Date */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={labelStyle}>Date <span style={{ color: '#ef4444' }}>*</span></label>
+              <input
+                type="date"
+                name="scheduledDate"
+                value={formData.scheduledDate}
+                onChange={handleChange}
+                required
+                style={inputStyle}
+                onFocus={focusInput}
+                onBlur={blurInput}
+              />
+            </div>
+
+            {/* Start & End Time */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
               <div>
                 <label style={labelStyle}>Start Time <span style={{ color: '#ef4444' }}>*</span></label>
                 <input

@@ -11,6 +11,7 @@ import {
   TextInput,
   ActivityIndicator,
   Switch,
+  Linking,
 } from 'react-native';
 import styles from './ProfileScreen.styles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -236,12 +237,12 @@ const ProfileScreen = () => {
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL('mailto:support@lineup-sports.in')}>
             <View style={styles.settingLeft}>
               <Text style={styles.settingIcon}>💬</Text>
               <View>
                 <Text style={styles.settingLabel}>Contact Support</Text>
-                <Text style={[styles.settingDesc, {color: "#000"}]}>Get help from our team</Text>
+                <Text style={[styles.settingDesc, {color: "#000"}]}>support@lineup-sports.in</Text>
               </View>
             </View>
             <Text style={styles.settingArrow}>›</Text>
@@ -407,7 +408,7 @@ const ProfileScreen = () => {
                 {'\n'}Divyanshu Katiyar
                 {'\n\n'}
                 <Text style={styles.aboutBold}>Support:</Text>
-                {'\n'}For help, contact dishukatz@gmail.com
+                {'\n'}For help, contact support@lineup-sports.in
               </Text>
             </ScrollView>
           </View>

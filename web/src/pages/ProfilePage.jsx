@@ -368,6 +368,55 @@ export const ProfilePage = () => {
         ))}
       </div>
 
+      {/* Contact Support */}
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        overflow: 'hidden',
+        marginBottom: '20px',
+      }}>
+        <h3 style={{
+          padding: '18px 24px 12px',
+          fontSize: '12px',
+          fontWeight: 700,
+          color: '#9ca3af',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          margin: 0,
+        }}>
+          Help & Support
+        </h3>
+        <a
+          href="mailto:support@lineup-sports.in"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 24px', textDecoration: 'none', color: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#f9fafb'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'white'; }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px',
+              background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="20" height="20" fill="none" stroke="#3b82f6" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: 0 }}>Contact Support</p>
+              <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>support@lineup-sports.in</p>
+            </div>
+          </div>
+          <svg width="20" height="20" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+
       {/* Logout */}
       <button
         onClick={handleLogout}
