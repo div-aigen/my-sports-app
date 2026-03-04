@@ -41,7 +41,7 @@ export const CreateSessionPage = () => {
       const response = await sessionAPI.create({
         title: formData.title,
         description: formData.description,
-        location_address: selectedVenue ? selectedVenue.name : '',
+        location_address: selectedVenue ? selectedVenue.address : '',
         scheduled_date: formData.scheduledDate,
         scheduled_time: formData.scheduledTime,
         scheduled_end_time: formData.scheduledEndTime,
