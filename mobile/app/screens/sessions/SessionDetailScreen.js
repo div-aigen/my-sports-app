@@ -6,6 +6,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Linking,
 } from 'react-native';
 import styles from './SessionDetailScreen.styles';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -125,7 +126,17 @@ const SessionDetailScreen = ({ route, navigation }) => {
           <Text style={styles.cardTitle}>Session Details</Text>
           <View style={styles.row}>
             <Text style={styles.label}>Location</Text>
-            <Text style={styles.value}>{session.location_address}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(session.location_address)}`;
+                Linking.openURL(mapsUrl);
+              }}
+              style={{ flex: 1 }}
+            >
+              <Text style={[styles.value, { color: '#2196F3', textDecorationLine: 'underline' }]}>
+                {session.location_address}
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Date</Text>
