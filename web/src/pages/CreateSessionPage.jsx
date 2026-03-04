@@ -27,9 +27,20 @@ export const CreateSessionPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      // Clear venue if sport changes and current venue doesn't offer the new sport
+      if (name === 'sportType' && prev.venueId) {
+        const currentVenue = venues.find(v => String(v.id) === prev.venueId);
+        if (currentVenue && !currentVenue.available_sports?.includes(value)) {
+          updated.venueId = '';
+        }
+      }
+      return updated;
+    });
   };
 
+  const filteredVenues = venues.filter(v => v.available_sports?.includes(formData.sportType));
   const selectedVenue = venues.find(v => String(v.id) === formData.venueId);
 
   const handleSubmit = async (e) => {
@@ -199,7 +210,7 @@ export const CreateSessionPage = () => {
                   onBlur={blurInput}
                 >
                   <option value="">Select venue</option>
-                  {venues.map((v) => (
+                  {filteredVenues.map((v) => (
                     <option key={v.id} value={v.id}>{v.name}</option>
                   ))}
                 </select>
