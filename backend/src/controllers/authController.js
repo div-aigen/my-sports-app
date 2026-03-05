@@ -262,6 +262,18 @@ const resendVerification = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    await User.deleteAccount(userId);
+    res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -273,4 +285,5 @@ module.exports = {
   registerPushToken,
   verifyEmail,
   resendVerification,
+  deleteAccount,
 };

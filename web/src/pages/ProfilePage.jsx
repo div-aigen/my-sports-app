@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { userAPI } from '../services/api';
+import { userAPI, authAPI } from '../services/api';
 
 export const ProfilePage = () => {
   const { user, logout, refreshUser } = useContext(AuthContext);
@@ -9,6 +9,10 @@ export const ProfilePage = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [openFaq, setOpenFaq] = useState(null);
 
   const faqs = [
@@ -109,6 +113,25 @@ export const ProfilePage = () => {
     if (confirm('Are you sure you want to logout?')) {
       logout();
       navigate('/login');
+    }
+  };
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (deleteConfirmEmail !== user?.email) {
+      setDeleteError('Email does not match your account email');
+      return;
+    }
+    setDeleteLoading(true);
+    setDeleteError('');
+    try {
+      await authAPI.deleteAccount();
+      logout();
+      navigate('/login');
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || 'Failed to delete account');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -446,6 +469,29 @@ export const ProfilePage = () => {
         </a>
       </div>
 
+      {/* Delete Account */}
+      <button
+        onClick={() => { setShowDeleteModal(true); setDeleteError(''); setDeleteConfirmEmail(''); }}
+        style={{
+          width: '100%',
+          padding: '14px',
+          background: 'white',
+          color: '#dc2626',
+          fontWeight: 700,
+          fontSize: '15px',
+          border: '2px solid #fecaca',
+          borderRadius: '14px',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+          fontFamily: 'inherit',
+          marginBottom: '12px',
+        }}
+        onMouseEnter={e => { e.target.style.background = '#fef2f2'; e.target.style.borderColor = '#f87171'; }}
+        onMouseLeave={e => { e.target.style.background = 'white'; e.target.style.borderColor = '#fecaca'; }}
+      >
+        Delete Account
+      </button>
+
       {/* Logout */}
       <button
         onClick={handleLogout}
@@ -553,6 +599,101 @@ export const ProfilePage = () => {
                   onMouseLeave={e => { e.target.style.boxShadow = 'none'; }}
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100, padding: '20px',
+          backdropFilter: 'blur(4px)',
+        }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteModal(false); }}
+        >
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.2)',
+            width: '100%',
+            maxWidth: '440px',
+            overflow: 'hidden',
+          }}>
+            <div style={{ height: '4px', background: 'linear-gradient(90deg, #ef4444, #dc2626)' }} />
+            <div style={{ padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#111827', margin: 0 }}>Delete Account</h3>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: '#f3f4f6', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '18px', color: '#6b7280',
+                  }}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <div style={{
+                background: '#fef2f2', borderLeft: '4px solid #ef4444',
+                padding: '12px 16px', borderRadius: '8px', marginBottom: '20px',
+              }}>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#991b1b', margin: '0 0 4px' }}>
+                  This action cannot be undone
+                </p>
+                <p style={{ fontSize: '13px', color: '#b91c1c', margin: 0 }}>
+                  Your account, all sessions you created, and your participation history will be permanently deleted.
+                </p>
+              </div>
+
+              {deleteError && (
+                <div style={{
+                  background: '#fef2f2', borderLeft: '4px solid #ef4444',
+                  color: '#991b1b', padding: '12px 16px', borderRadius: '8px',
+                  marginBottom: '16px', fontSize: '14px', fontWeight: 500,
+                }}>
+                  {deleteError}
+                </div>
+              )}
+
+              <form onSubmit={handleDeleteAccount}>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ ...labelStyle, color: '#374151' }}>
+                    Type your email <strong>{user?.email}</strong> to confirm
+                  </label>
+                  <input
+                    type="email"
+                    value={deleteConfirmEmail}
+                    onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                    placeholder={user?.email}
+                    required
+                    style={inputStyle}
+                    onFocus={focusInput}
+                    onBlur={blurInput}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={deleteLoading}
+                  style={{
+                    width: '100%', padding: '14px',
+                    background: 'linear-gradient(90deg, #ef4444, #dc2626)',
+                    color: 'white', fontWeight: 700, fontSize: '15px',
+                    border: 'none', borderRadius: '12px',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                    opacity: deleteLoading ? 0.7 : 1,
+                    transition: 'all 0.2s', fontFamily: 'inherit',
+                  }}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete My Account'}
                 </button>
               </form>
             </div>

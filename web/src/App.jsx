@@ -13,6 +13,7 @@ import { MySessionsPage } from './pages/MySessionsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { DeleteAccountInfoPage } from './pages/DeleteAccountInfoPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<ProtectedRoute allowUnverified><VerifyEmailPage /></ProtectedRoute>} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/delete-account-info" element={<DeleteAccountInfoPage />} />
 
           {/* Protected routes with shared layout */}
           <Route

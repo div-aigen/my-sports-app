@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import api from '../../../services/api';
+import api, { authAPI } from '../../../services/api';
 
 const ProfileScreen = () => {
   const { user, logout } = useContext(AuthContext);
@@ -93,6 +93,29 @@ const ProfileScreen = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This action cannot be undone. Your account, all sessions you created, and your participation history will be permanently deleted.\n\nAre you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await authAPI.deleteAccount();
+              await logout();
+              router.replace('/');
+            } catch (err) {
+              Alert.alert('Error', err.response?.data?.error || 'Failed to delete account');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleLogout = () => {
@@ -261,12 +284,29 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Logout Button */}
+        {/* Delete Account Button */}
         <TouchableOpacity
           style={styles.logoutButton}
+          onPress={handleDeleteAccount}
+        >
+          <Text style={styles.logoutButtonText}>Delete Account</Text>
+        </TouchableOpacity>
+
+        {/* Logout Button */}
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'white',
+            marginHorizontal: 16,
+            marginTop: 12,
+            paddingVertical: 16,
+            borderRadius: 12,
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: '#f44336',
+          }}
           onPress={handleLogout}
         >
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <Text style={{ color: '#f44336', fontSize: 16, fontWeight: 'bold' }}>Logout</Text>
         </TouchableOpacity>
 
         <View style={styles.bottomPadding} />

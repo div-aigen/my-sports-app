@@ -25,6 +25,7 @@ export const authAPI = {
     api.post('/auth/reset-password', { email, token, new_password: newPassword }),
   verifyEmail: (email, token) => api.post('/auth/verify-email', { email, token }),
   resendVerification: () => api.post('/auth/resend-verification'),
+  deleteAccount: () => api.delete('/auth/account'),
 };
 
 export const sessionAPI = {

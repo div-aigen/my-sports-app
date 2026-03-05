@@ -142,6 +142,25 @@ class User {
     return result.rows[0]?.email_verified || false;
   }
 
+  static async deleteAccount(userId) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Delete participant records
+      await client.query('DELETE FROM participants WHERE user_id = $1', [userId]);
+      // Delete sessions created by user (cascade will remove their participants too)
+      await client.query('DELETE FROM sessions WHERE creator_id = $1', [userId]);
+      // Delete the user
+      await client.query('DELETE FROM users WHERE id = $1', [userId]);
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   static async resetPasswordWithToken(email, token, newPassword) {
     // Verify token is valid
     const user = await this.verifyResetToken(email, token);

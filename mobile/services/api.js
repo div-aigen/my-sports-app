@@ -49,6 +49,7 @@ export const authAPI = {
   registerPushToken: (token) => api.post('/auth/push-token', { token }),
   verifyEmail: (email, token) => api.post('/auth/verify-email', { email, token }),
   resendVerification: () => api.post('/auth/resend-verification'),
+  deleteAccount: () => api.delete('/auth/account'),
 };
 
 export const venueAPI = {

@@ -97,4 +97,7 @@ router.post(
   authController.registerPushToken
 );
 
+// DELETE /api/auth/account
+router.delete('/account', authenticateToken, authController.deleteAccount);
+
 module.exports = router;
