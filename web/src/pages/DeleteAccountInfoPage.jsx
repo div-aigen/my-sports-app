@@ -34,8 +34,7 @@ export const DeleteAccountInfoPage = () => {
                 <li>Open the Lineup app and log in</li>
                 <li>Go to the <strong>Profile</strong> tab</li>
                 <li>Scroll down and tap <strong>Delete Account</strong></li>
-                <li>Type your email address to confirm</li>
-                <li>Tap <strong>Delete My Account</strong></li>
+                <li>Tap <strong>Delete My Account</strong> when prompted again</li>
               </ol>
             </div>
             <div>
