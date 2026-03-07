@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineup",
     "slug": "mobile",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/sport_5351478.png",
     "scheme": "sportsapp",
@@ -15,7 +15,7 @@
       }
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/sport_5351478.png",
         "backgroundColor": "#ffffff"
