@@ -3,7 +3,6 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { authAPI } from './api';
 
-// Configure how notifications appear when the app is in the foreground
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -45,11 +44,7 @@ export async function registerForPushNotifications() {
     });
 
     const pushToken = tokenData.data;
-    console.log('Got push token:', pushToken);
-
     await authAPI.registerPushToken(pushToken);
-    console.log('Push token registered with backend:', pushToken);
-
     return pushToken;
   } catch (err) {
     console.error('Push notification registration failed:', err);
