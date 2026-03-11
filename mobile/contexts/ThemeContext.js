@@ -4,11 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load theme preference from storage
     const loadTheme = async () => {
       try {
         const savedTheme = await AsyncStorage.getItem('theme');
@@ -21,7 +20,6 @@ export const ThemeProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
     loadTheme();
   }, []);
 
@@ -37,17 +35,50 @@ export const ThemeProvider = ({ children }) => {
 
   const theme = {
     isDark: isDarkMode,
-    colors: {
-      background: isDarkMode ? '#1a1a1a' : '#ffffff',
-      surface: isDarkMode ? '#2d2d2d' : '#f8f9fa',
-      text: isDarkMode ? '#ffffff' : '#333333',
-      textSecondary: isDarkMode ? '#b0b0b0' : '#666666',
-      border: isDarkMode ? '#404040' : '#e0e0e0',
-      primary: '#2196F3',
-      success: '#4CAF50',
-      danger: '#f44336',
-      warning: '#FF9800',
-      overlay: isDarkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+    colors: isDarkMode ? {
+      background: '#0A0A0A',
+      surface: '#161616',
+      surfaceElevated: '#1E1E1E',
+      text: '#FFFFFF',
+      textSecondary: '#A1A1AA',
+      textMuted: '#71717A',
+      border: '#27272A',
+      primary: '#D0FD3E',
+      onPrimary: '#000000',
+      accent: '#D0FD3E',
+      success: '#4ADE80',
+      danger: '#FF453A',
+      warning: '#FBBF24',
+      overlay: 'rgba(0, 0, 0, 0.8)',
+      card: '#161616',
+      tabBar: '#0A0A0A',
+      tabBarActive: '#D0FD3E',
+      tabBarInactive: '#52525B',
+      inputBg: '#1E1E1E',
+      inputBorder: '#27272A',
+      headerBg: '#0A0A0A',
+    } : {
+      background: '#F8FAFC',
+      surface: '#FFFFFF',
+      surfaceElevated: '#F1F5F9',
+      text: '#0F172A',
+      textSecondary: '#64748B',
+      textMuted: '#94A3B8',
+      border: '#E2E8F0',
+      primary: '#059669',
+      onPrimary: '#FFFFFF',
+      accent: '#059669',
+      success: '#22C55E',
+      danger: '#EF4444',
+      warning: '#F59E0B',
+      overlay: 'rgba(0, 0, 0, 0.5)',
+      card: '#FFFFFF',
+      tabBar: '#FFFFFF',
+      tabBarActive: '#059669',
+      tabBarInactive: '#94A3B8',
+      inputBg: '#F1F5F9',
+      inputBorder: '#E2E8F0',
+      headerBg: '#FFFFFF',
     },
   };
 

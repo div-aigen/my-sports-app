@@ -20,20 +20,16 @@ export const formatDateTime = (dateString) => {
 
 export const formatEndTimeWithDate = (startTime, endTime, dateString) => {
   if (!endTime) return 'N/A';
-
   const formattedTime = formatTime(endTime);
-
   const [startHour, startMin] = startTime.split(':').map(Number);
   const [endHour, endMin] = endTime.split(':').map(Number);
   const startMinutes = startHour * 60 + startMin;
   const endMinutes = endHour * 60 + endMin;
-
   if (endMinutes <= startMinutes && startTime) {
     const date = new Date(dateString);
     const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
     const formattedDate = formatDate(nextDate.toISOString());
     return `${formattedTime} (${formattedDate})`;
   }
-
   return formattedTime;
 };

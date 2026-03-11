@@ -1,14 +1,13 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Production backend URL
-const API_URL = 'https://my-sports-app-testing.up.railway.app/api';
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const API_URL = EXPO_PUBLIC_BACKEND_URL ? `${EXPO_PUBLIC_BACKEND_URL}/api` : 'https://my-sports-app-testing.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_URL,
 });
 
-// Add token to requests
 api.interceptors.request.use(
   async (config) => {
     try {
@@ -22,16 +21,12 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
-// Add response error logging
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     console.error('API Error:', error.response?.status, error.response?.data, error.message);
     return Promise.reject(error);

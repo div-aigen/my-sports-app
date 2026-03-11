@@ -4,7 +4,7 @@
     "slug": "mobile",
     "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/images/sport_5351478.png",
+    "icon": "./assets/images/Sports_5351479.png",
     "scheme": "sportsapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -17,47 +17,29 @@
     "android": {
       "versionCode": 4,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/sport_5351478.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/Sports_5351479.png",
+        "backgroundColor": "#0A0A0A"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.div.mysportsapp",
-      "googleServicesFile": "./google-services.json",
       "intentFilters": [
         {
           "action": "VIEW",
           "autoVerify": true,
-          "data": [
-            {
-              "scheme": "sportsapp",
-              "host": "*"
-            }
-          ],
+          "data": [{ "scheme": "sportsapp", "host": "*" }],
           "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
           "autoVerify": true,
-          "data": [
-            {
-              "scheme": "https",
-              "host": "lineup-sports.in",
-              "pathPrefix": "/sessions/"
-            }
-          ],
+          "data": [{ "scheme": "https", "host": "lineup-sports.in", "pathPrefix": "/sessions/" }],
           "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
           "autoVerify": true,
-          "data": [
-            {
-              "scheme": "https",
-              "host": "www.lineup-sports.in",
-              "pathPrefix": "/sessions/"
-            }
-          ],
+          "data": [{ "scheme": "https", "host": "www.lineup-sports.in", "pathPrefix": "/sessions/" }],
           "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
@@ -71,12 +53,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/sport_5351478.png",
+          "image": "./assets/images/Sports_5351479.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#0A0A0A",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#0A0A0A"
           }
         }
       ],
@@ -84,14 +66,13 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/sport_5351478.png",
-          "color": "#2563eb"
+          "icon": "./assets/images/Sports_5351479.png",
+          "color": "#D0FD3E"
         }
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {

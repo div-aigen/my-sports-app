@@ -1,50 +1,96 @@
-# Welcome to your Expo app 👋
+# Lineup — Sports Session Management App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Find and join local sports sessions, split costs, and play with your squad.
 
-## Get started
+![System Architecture](./Lineup-system-architecture.png)
 
-1. Install dependencies
+## Live
 
-   ```bash
-   npm install
-   ```
+| Platform | URL |
+|---|---|
+| Web | [www.lineup-sports.in](https://www.lineup-sports.in) |
+| Android | Google Play (Internal Testing) |
+| Backend | Railway (Node.js + PostgreSQL) |
 
-2. Start the app
+## Project Structure
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Football App/
+├── backend/    # Node.js + Express API
+├── web/        # React web app (Vite) → Vercel
+├── mobile/     # React Native app (Expo) → Google Play
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Tech Stack
 
-## Learn more
+| Layer | Tech |
+|---|---|
+| Backend | Node.js, Express, PostgreSQL, Socket.io, JWT |
+| Web | React 18, Vite, Axios, Context API |
+| Mobile | React Native, Expo, expo-router, AsyncStorage |
+| Email | SendGrid (noreply@lineup-sports.in) |
+| Push Notifications | Expo Push + Firebase (FCM) |
 
-To learn more about developing your project with Expo, look at the following resources:
+## Features
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Browse and join open sports sessions by sport, location, and date
+- Create sessions with automatic equal cost splitting among participants
+- Invite friends via shareable link or invite code
+- Push notifications for session updates (full, cancelled)
+- Email verification on signup, password reset via email
+- Dark mode support (mobile)
+- Account deletion with full data removal
 
-## Join the community
+## Services
 
-Join our community of developers creating universal apps.
+See architecture diagram above. Key services:
+- **Namecheap** — DNS for lineup-sports.in
+- **Vercel** — Web frontend hosting
+- **Railway** — Backend API + PostgreSQL database
+- **SendGrid** — Transactional email
+- **Zoho Mail** — support@lineup-sports.in
+- **Expo EAS** — Android AAB builds
+- **Google Play Console** — App distribution
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Local Development
+
+### Backend
+```bash
+cd backend && npm install && npm run dev
+# Runs on http://localhost:5000
+```
+
+`.env` required:
+```
+DATABASE_URL=postgresql://localhost:5432/football_app
+JWT_SECRET=your_secret
+EMAIL_USER=...
+EMAIL_APP_PASSWORD=...
+```
+
+### Web
+```bash
+cd web && npm install && npm run dev
+# Runs on http://localhost:5173
+```
+
+`.env` required:
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Mobile
+```bash
+cd mobile && npm install && npx expo start
+```
+
+## Deployment
+
+- **Backend**: Auto-deploys to Railway on `git push main`
+- **Web**: `npx vercel --prod` in `/web`
+- **Mobile**: `eas build --platform android --profile production` → upload to Play Console
+
+## Support
+
+[support@lineup-sports.in](mailto:support@lineup-sports.in)

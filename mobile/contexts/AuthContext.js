@@ -39,7 +39,6 @@ export const AuthProvider = ({ children }) => {
       }
       return response.data;
     } catch (err) {
-      console.error('Signup error in context:', err);
       throw err;
     }
   };
@@ -54,7 +53,6 @@ export const AuthProvider = ({ children }) => {
       }
       return response.data;
     } catch (err) {
-      console.error('Login error in context:', err);
       throw err;
     }
   };
