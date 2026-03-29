@@ -7,6 +7,7 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:5174',
   'https://lineup-sports.in',
   'https://www.lineup-sports.in',
@@ -52,6 +53,9 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/venues', require('./routes/venues'));
+
+// Dashboard routes (admin panel)
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 // Health check
 app.get('/health', (req, res) => {
